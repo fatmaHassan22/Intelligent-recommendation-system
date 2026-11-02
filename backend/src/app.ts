@@ -1,0 +1,50 @@
+import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import {rateLimit} from 'express-rate-limit';
+import {randomUUID} from 'node:crypto';
+import type {Pool} from 'mysql2/promise';
+import type {Config} from './config.js';
+import {rows} from './db.js';
+import {ApiError,errorHandler,logger} from './errors.js';
+import {authenticate,protectCsrf,requireRole} from './middleware/security.js';
+import {authRoutes} from './modules/auth/controller.js';
+import {catalogRoutes} from './modules/catalog/controller.js';
+import {studentRoutes} from './modules/profiles/controller.js';
+import {planningRoutes} from './modules/planning/controller.js';
+import {productivityRoutes} from './modules/productivity/controller.js';
+import {engagementRoutes,tickerRoutes} from './modules/engagement/controller.js';
+import {aiRoutes} from './modules/ai/controller.js';
+import {moodleRoutes,adminMoodleRoutes} from './modules/moodle/controller.js';
+import type {StudyProvider} from './modules/ai/provider.js';
+import type {MoodleAdapter} from './modules/moodle/adapter.js';
+import {pushRoutes} from './modules/push/service.js';
+export function createApp(pool:Pool,c:Config,authLimit=20,productivityClock=()=>new Date(),providers:{ai?:StudyProvider;moodle?:MoodleAdapter}={}) {
+ const app=express();app.disable('x-powered-by');app.set('trust proxy',c.TRUST_PROXY_HOPS);
+ const allowed=new Set(c.CORS_ORIGINS.split(',').map(s=>s.trim()));
+ app.use((req,res,next)=>{res.locals.requestId=randomUUID();res.setHeader('X-Request-Id',res.locals.requestId);res.setHeader('Cache-Control','no-store');
+  res.on('finish',()=>logger.info({event:'request',request_id:res.locals.requestId,method:req.method,...(c.NODE_ENV==='production'?{}:{path:req.path}),status:res.statusCode}));next();});
+ app.use(helmet());
+ // The sole edge proxy overwrites forwarded headers; backend has no published port.
+ app.use((req,res,next)=>{if(c.NODE_ENV==='production'&&!req.secure&&req.path.startsWith('/api/')){res.status(400).json({error:{code:'HTTPS_REQUIRED'}});return;}next();});
+ app.use(cors({origin:(origin,callback)=>{if(!origin||allowed.has(origin))callback(null,true);else callback(new ApiError(403,'ORIGIN_NOT_ALLOWED'));},credentials:true,methods:['GET','POST','PATCH','DELETE','OPTIONS'],allowedHeaders:['Content-Type','X-CSRF-Token']}));
+ app.use(rateLimit({windowMs:60000,limit:300,standardHeaders:'draft-8',legacyHeaders:false,message:{error:{code:'RATE_LIMITED'}}}));
+ app.use(express.json({limit:'16kb'}));
+ app.get('/health',async(req,res)=>{try{await rows(pool,'SELECT 1 AS ready');await rows(pool,'SELECT institution_base_url,baseline_at FROM moodle_connections LIMIT 1');res.json({status:'ok'});}catch{res.status(503).json({status:'unavailable'});}});
+ app.use('/api/v1',protectCsrf(c));
+ app.use('/api/v1/auth',authRoutes(pool,c,authLimit));
+ // Public academic browsing allows selecting a plan during registration; no private data here.
+ app.use('/api/v1',catalogRoutes(pool));
+ app.use('/api/v1/students',authenticate(pool,c),requireRole('STUDENT'),studentRoutes(pool));
+ app.use('/api/v1/students/me',authenticate(pool,c),requireRole('STUDENT'),planningRoutes(pool));
+ app.use('/api/v1/students/me',authenticate(pool,c),requireRole('STUDENT'),productivityRoutes(pool,productivityClock,c));
+ app.use('/api/v1/students/me',authenticate(pool,c),requireRole('STUDENT'),engagementRoutes(pool,productivityClock));
+ app.use('/api/v1/ticker',authenticate(pool,c),tickerRoutes(pool,productivityClock));
+ app.use('/api/v1/admin/ticker',authenticate(pool,c),requireRole('ADMIN'),tickerRoutes(pool,productivityClock,true));
+ app.use('/api/v1/students/me/ai',authenticate(pool,c),requireRole('STUDENT'),aiRoutes(pool,c,productivityClock,providers.ai));
+ app.use('/api/v1/students/me/moodle',authenticate(pool,c),requireRole('STUDENT'),moodleRoutes(pool,c,productivityClock,providers.moodle));
+ app.use('/api/v1/students/me/push',authenticate(pool,c),requireRole('STUDENT'),pushRoutes(pool,c));
+ app.use('/api/v1/admin/moodle',authenticate(pool,c),requireRole('ADMIN'),adminMoodleRoutes(pool,c,productivityClock));
+ app.get('/api/v1/admin/status',authenticate(pool,c),requireRole('ADMIN'),(req,res)=>res.json({status:'ok'}));
+ app.use((req,res)=>res.status(404).json({error:{code:'NOT_FOUND'}}));app.use(errorHandler);return app;
+}

@@ -1,0 +1,758 @@
+{
+  ".gitignore": {
+    "bytes": 146,
+    "sha256": "7091b075333e1c702b7063e339e17105516c26d8ddf820416bd4d251241fe4b4"
+  },
+  "backend/.dockerignore": {
+    "bytes": 203,
+    "sha256": "77d18a1526a6fe4e867fa40450f54af4e323b5a0a16909790d267f66b450454b"
+  },
+  "backend/.env.example": {
+    "bytes": 1286,
+    "sha256": "3d3dc37da46e82d4d7926c3cefd17a950d8d8c4bc9ff0f32ee87cc1a4ca35ff4"
+  },
+  "backend/Dockerfile": {
+    "bytes": 1048,
+    "sha256": "e8bc98cdfc2d6665544f65cfbfe367cca264c745f302db3e3d58194ab2caa0e7"
+  },
+  "backend/migrations/002_student_backend.sql": {
+    "bytes": 2482,
+    "sha256": "12c689968f6fb291dfd68debc710fd2838ea8370abe6e79cd8ee0148e18e32d3"
+  },
+  "backend/migrations/003_academic_planner.sql": {
+    "bytes": 1631,
+    "sha256": "d32d47c58beedbe04b46c6a70b67bd2dc082c713e689b2d95d607e67c2632cfc"
+  },
+  "backend/migrations/004_planner_offering_evidence.sql": {
+    "bytes": 489,
+    "sha256": "42bcbad3aa6befbb32f981a2d1be5218952deb498b874d3c26dda1591647e6e3"
+  },
+  "backend/migrations/005_student_productivity.sql": {
+    "bytes": 5909,
+    "sha256": "91f7537289def601eda76378e9cebd8299ca7578cee819504e3430ef8a465d24"
+  },
+  "backend/migrations/006_student_engagement.sql": {
+    "bytes": 4419,
+    "sha256": "e08ca9de9c33aef51d110023a0d72931200a949d55707f74acf0677ed68e55a7"
+  },
+  "backend/migrations/007_ai_moodle.sql": {
+    "bytes": 5295,
+    "sha256": "e07e9850ac5768c18f651f0cf2a0c71bce312478dda496cc0eda1cd9cc578fb3"
+  },
+  "backend/migrations/008_moodle_institution_binding.sql": {
+    "bytes": 76,
+    "sha256": "3e1ce715defcfe47cda1edc6c50b38aa6c19523c553e7e0fc7f9c19da7fc9136"
+  },
+  "backend/migrations/009_moodle_push.sql": {
+    "bytes": 1769,
+    "sha256": "e3d10e145f59c8986167e16edcc94b06815c87bfa0fc1c56befe5ec094d3ed40"
+  },
+  "backend/package.json": {
+    "bytes": 1043,
+    "sha256": "7b66108e1af86eba68e81f80d2607dd807da4615101e905aa28f66767972bab3"
+  },
+  "backend/pnpm-lock.yaml": {
+    "bytes": 58832,
+    "sha256": "989149c8ab7ab70f6d409107c616f6cb6ab8e6aedde6d8d0e03dba98cf0e9016"
+  },
+  "backend/pnpm-workspace.yaml": {
+    "bytes": 29,
+    "sha256": "ac02d96368617c760f093cfe61fdec64b6244007ab3553e0d6621f706f54a353"
+  },
+  "backend/README.md": {
+    "bytes": 248,
+    "sha256": "4efae99ba02e2ce1df4d30e0cf2cb9f0908f326e1bfead313ffa708f4b464e03"
+  },
+  "backend/scripts/inspect.ts": {
+    "bytes": 981,
+    "sha256": "d365876d094daa3e94101d7ce36e074c9561c7adc1f0b15c4e8aaf409c670dca"
+  },
+  "backend/scripts/migrate.ts": {
+    "bytes": 268,
+    "sha256": "b0c1245c69d8867d83e00864f7d8c7b6ab56e97f409b88d7e6980319f87addfa"
+  },
+  "backend/scripts/migrations.ts": {
+    "bytes": 2169,
+    "sha256": "b6cec593153726e6b2179809eb3be24be08ede3a7935370857838c76633eac04"
+  },
+  "backend/scripts/phase3-snapshot.ts": {
+    "bytes": 795,
+    "sha256": "a8b7a67d4d422ba50ff2e2bc82a16093a7ee1808f5d8c787a75ac20d17f4f806"
+  },
+  "backend/scripts/phase4-audit.ts": {
+    "bytes": 1395,
+    "sha256": "535f0ec051aa07014b5a860da7a0787575b6ef32465e3939e2dddbd6b5ca49e3"
+  },
+  "backend/scripts/phase4-environments.ts": {
+    "bytes": 904,
+    "sha256": "ff8ffb063919f882bc7c8a01eec1aac1789935d1029b227e349a79021936257c"
+  },
+  "backend/scripts/phase4-grants.ts": {
+    "bytes": 1474,
+    "sha256": "0ac8693156213bf4aa5b3752c8a3baf6f558f757fc9a03c4acd9e7d231927263"
+  },
+  "backend/scripts/phase4-snapshot.ts": {
+    "bytes": 1234,
+    "sha256": "2c435fd77843312dd6305cbb5d093bf083aa4a589db68d4fd4ef2c58badf3bad"
+  },
+  "backend/scripts/phase5-environments.ts": {
+    "bytes": 879,
+    "sha256": "73d5df3e78645857a41cb77ba6e071eaa1b194eaad9beadaf12481f023493f33"
+  },
+  "backend/scripts/phase5-preservation.ts": {
+    "bytes": 1384,
+    "sha256": "e0cbba004161e351f37b254bc1a030afb462e7d7ef8a8a4e3793a2bff45b49f7"
+  },
+  "backend/scripts/phase6-browser-fixtures.ts": {
+    "bytes": 2048,
+    "sha256": "0f1b16ea24ae4987e28fc3a0fa67414d14d62286b93ad0764060b67eb9762df7"
+  },
+  "backend/scripts/phase6-environments.ts": {
+    "bytes": 886,
+    "sha256": "3193830abe9281f8780a8db69a156f845cf52eb9e95bc81aa1b03906084ecdf3"
+  },
+  "backend/scripts/phase6-preservation.ts": {
+    "bytes": 1555,
+    "sha256": "aaaa4e12df5edbd895ef0f9b83fd48f8a48eec9f2be290d17c208ec2d010281b"
+  },
+  "backend/scripts/phase7-browser-fixtures.ts": {
+    "bytes": 1311,
+    "sha256": "f8927be646749478d8eae63d585e517efc68a22ffe877e933ba6729fb068db6f"
+  },
+  "backend/scripts/phase7-environments.ts": {
+    "bytes": 886,
+    "sha256": "5500089a8967d5e10c90c1a7127f608ea448e636e13e4b3b061294c5d521b327"
+  },
+  "backend/scripts/phase7-preservation.ts": {
+    "bytes": 1733,
+    "sha256": "aaeadd2d12b937d5d93e46e86af6577ba4c7c2fd133cdd6762bb6d9031c3e8ae"
+  },
+  "backend/scripts/phase8a-preservation.ts": {
+    "bytes": 1879,
+    "sha256": "4ffa459c945c854cc995cb0dc7dc8c2190dbb1823c468d02496fa9820314c6c1"
+  },
+  "backend/scripts/phase8b-migrate-main.ts": {
+    "bytes": 2542,
+    "sha256": "d6332c6d0a806267b64778ad750432f24396d149a7b961e7eaf3a4b1e7bc1783"
+  },
+  "backend/scripts/phase8b-preservation.ts": {
+    "bytes": 2043,
+    "sha256": "6b198bee672eafaeb5a59db4073c3987ab1d313a60099d356d40129c8052463e"
+  },
+  "backend/scripts/prepare-test-db.ts": {
+    "bytes": 3365,
+    "sha256": "850700a6c6783089860f98654ba3070391c0a811c657e7eb5eb5b35a5509cee1"
+  },
+  "backend/scripts/production-migrate.ts": {
+    "bytes": 1515,
+    "sha256": "16bc94ae7b518dfddc5978293b69514ecef4805df9c46d56e892ed1f814d35e7"
+  },
+  "backend/scripts/provision-local-user.ts": {
+    "bytes": 2568,
+    "sha256": "9a33bbac249d8a6b1c9cb0f2bbaa38e8585b757cef1cefc807d44b5007175b5d"
+  },
+  "backend/scripts/run-tests.ts": {
+    "bytes": 1391,
+    "sha256": "03a9dee9171eeb77a20da8e63460daa8357445b7711117ca2aa4a5e44b0dc143"
+  },
+  "backend/scripts/run.ps1": {
+    "bytes": 2213,
+    "sha256": "92c9dd022ab885c8b91e067d3a6bd4bd21ec0e272fce7caf35a4019eacf6bd21"
+  },
+  "backend/scripts/snapshot.ts": {
+    "bytes": 989,
+    "sha256": "be5895ed07e5bac3d2d5d4589e8a8385446f003392abdc01bb9a797318e0b3c1"
+  },
+  "backend/src/app.ts": {
+    "bytes": 4373,
+    "sha256": "20881408996296f7e8e80951f2319be1599b7a2a42183994b2f2ea9085740791"
+  },
+  "backend/src/config.ts": {
+    "bytes": 3986,
+    "sha256": "174e4d39709ce395bc034249013425d18e96865a030fc77264875212af2f59d4"
+  },
+  "backend/src/db.ts": {
+    "bytes": 1224,
+    "sha256": "f99a5a91af3bf6e4f78c35d7733eeca8618a875023c2106cbd7564f6b6b0a6b3"
+  },
+  "backend/src/errors.ts": {
+    "bytes": 1292,
+    "sha256": "18c0676777250a58ee13069e5f049d26cb2978b68edee9bf2431e5e3990cbef9"
+  },
+  "backend/src/middleware/security.ts": {
+    "bytes": 3194,
+    "sha256": "94ce0d545325a0a7d213563818a2abb8c0cae75ef25ffb977ae51c8589158fa3"
+  },
+  "backend/src/modules/ai/controller.ts": {
+    "bytes": 3662,
+    "sha256": "dff674e71079968e2ecf15408621cabc347fd9c59f73782b66b9f7af550b93e8"
+  },
+  "backend/src/modules/ai/grounding.ts": {
+    "bytes": 5969,
+    "sha256": "8fc9fdc161e6a3b3ecc1c083bb61db11847b76e5a926eec76f68137f96638f6c"
+  },
+  "backend/src/modules/ai/provider.ts": {
+    "bytes": 2967,
+    "sha256": "527892b8a4e84be8ff87317f681f674051aafd2f9f723e6de4e80a002f8fc04b"
+  },
+  "backend/src/modules/ai/service.ts": {
+    "bytes": 12132,
+    "sha256": "808b89947285b9855bff2c45f11e210116637e537d8230d48d54f66dff337886"
+  },
+  "backend/src/modules/auth/controller.ts": {
+    "bytes": 1670,
+    "sha256": "78a6f5fa7076db018fb28a4167df317661659a7844858c9e533b0a3f013882b4"
+  },
+  "backend/src/modules/auth/repository.ts": {
+    "bytes": 487,
+    "sha256": "5c820540d1273119c668a4e2940765371b910936c9aed1baaa1e98c96292d520"
+  },
+  "backend/src/modules/auth/service.ts": {
+    "bytes": 2016,
+    "sha256": "8a8664a17cac66efdaaaacb75d8738078378eab207969d953ef464e3083ebac4"
+  },
+  "backend/src/modules/catalog/controller.ts": {
+    "bytes": 935,
+    "sha256": "ef6ac180424da92679c26400a8c216a807668a02a894180ba09175ce4169e1ae"
+  },
+  "backend/src/modules/catalog/repository.ts": {
+    "bytes": 5175,
+    "sha256": "293a2b5f0cccab660ef38913b753167b62453653b2bb816e62634bd4c9ffc809"
+  },
+  "backend/src/modules/completions/repository.ts": {
+    "bytes": 1029,
+    "sha256": "f2febda89a922ab09e9dcfbabb7005e8f5c6f5d8ed0532b15d53e8754026b356"
+  },
+  "backend/src/modules/completions/service.ts": {
+    "bytes": 1374,
+    "sha256": "a18846376652c7f30b37f92f0d2470f28eb47a990f6731aec49140cde49779bf"
+  },
+  "backend/src/modules/engagement/controller.ts": {
+    "bytes": 6572,
+    "sha256": "3a20e4423e40f2b7125368c4b853840538bf072914c0f3be588efc10e77cc50f"
+  },
+  "backend/src/modules/engagement/messages.ts": {
+    "bytes": 2923,
+    "sha256": "d73ebd1e8cdf514aa231d0c289410b5f5821914318baab3512e153496a259dad"
+  },
+  "backend/src/modules/engagement/rules.ts": {
+    "bytes": 945,
+    "sha256": "105c0ef33039a22b2bb6ba5405b4effe385dcc2379bbcb6a141a5d202c5b8980"
+  },
+  "backend/src/modules/engagement/service.ts": {
+    "bytes": 5408,
+    "sha256": "3ada96f665c43b92f05036d3447d85c0f786da8219c177e9f7a442838e6ba3c6"
+  },
+  "backend/src/modules/integration-jobs.ts": {
+    "bytes": 1789,
+    "sha256": "c8b0f4418fe260b132f0412fd7979fdfcc6c1ffb8a297ea1397d37bd1171d053"
+  },
+  "backend/src/modules/moodle/adapter.ts": {
+    "bytes": 10449,
+    "sha256": "59ecddc95ef45f9bc77a2ef85a2f1be42a74205ff68ac8264eb94373c396bb4f"
+  },
+  "backend/src/modules/moodle/browser-boundary.ts": {
+    "bytes": 1936,
+    "sha256": "34658294f6e3cd63680652242be9a6bd7b4f4b23484c06edc21c98bb912b89e3"
+  },
+  "backend/src/modules/moodle/controller.ts": {
+    "bytes": 4706,
+    "sha256": "3c5eb1b2ff82f7f9ca0006d0b6401e4ee63278863a59e7bc7a9c4b2850e25299"
+  },
+  "backend/src/modules/moodle/scheduling.ts": {
+    "bytes": 282,
+    "sha256": "1c008f04cc684ee848f300dbc92d85602a42af51f62d6c0da87c49b42bbe73dd"
+  },
+  "backend/src/modules/moodle/security.ts": {
+    "bytes": 2437,
+    "sha256": "971c629ca880f539665898941bede4af05266be093be21968f0a762c982db5c2"
+  },
+  "backend/src/modules/moodle/service.ts": {
+    "bytes": 15452,
+    "sha256": "c2e7ea85ea1f04637eb26eb1e6bc91005c234369079d6aa1de464db1d19db22a"
+  },
+  "backend/src/modules/moodle/worker.ts": {
+    "bytes": 1106,
+    "sha256": "f7648992894d77d0f22b3febf5a7cfcc9d296fdeba7b930a0957fadfa37c77f8"
+  },
+  "backend/src/modules/planning/controller.ts": {
+    "bytes": 4076,
+    "sha256": "217cd40e39462fd894c1df242d648a98264fdf8a7a6beb3c9cf38c495978c85d"
+  },
+  "backend/src/modules/planning/engine.ts": {
+    "bytes": 15537,
+    "sha256": "56f2c335c141f32f7b5c7149f8400d564e5161f9fe66bb540d290725cb8f63ee"
+  },
+  "backend/src/modules/planning/repository.ts": {
+    "bytes": 4929,
+    "sha256": "8c2d99a8b055d7ae254844798279ed40f1b9e29d7a3c9bd6efef0edf93a9dc62"
+  },
+  "backend/src/modules/planning/service.ts": {
+    "bytes": 4796,
+    "sha256": "275373372d2bb18be0f97d5634d605534b5f51bce6f3642651438d4c3766825a"
+  },
+  "backend/src/modules/prerequisites/service.ts": {
+    "bytes": 1140,
+    "sha256": "d4539162e092e53c8780f66414e737aae600243b51f00b153cd0a2006849c251"
+  },
+  "backend/src/modules/productivity/controller.ts": {
+    "bytes": 5714,
+    "sha256": "78a2099995560114c65f734d6b44a920c006047b105553625bab56d21d9f7a80"
+  },
+  "backend/src/modules/productivity/notifications.ts": {
+    "bytes": 3812,
+    "sha256": "2a9ac55bcc596c99d750df7c2d529dd317a602cfb31f6ce2a67bc981838b124d"
+  },
+  "backend/src/modules/productivity/pomodoro.ts": {
+    "bytes": 8624,
+    "sha256": "5436e1b0e9c3eaa6cb1be9235e7e495d3be3ba9331728ba01256f97e06988d6d"
+  },
+  "backend/src/modules/productivity/records.ts": {
+    "bytes": 8627,
+    "sha256": "4093cd977265ae198a7a6cd233855e5b156753fb4cafab0963855df222d50022"
+  },
+  "backend/src/modules/productivity/scheduler.ts": {
+    "bytes": 5413,
+    "sha256": "b85b46d1d4621c1fc001ca8b28c0112cd96fe1f69e5e33d65031f0366fd2aa52"
+  },
+  "backend/src/modules/productivity/time.ts": {
+    "bytes": 2570,
+    "sha256": "4461a05c5561faf26b5441a757a98983efd14c7bfd78cf89dec8d68188aa38c3"
+  },
+  "backend/src/modules/productivity/validation.ts": {
+    "bytes": 4692,
+    "sha256": "d5a208993a75219b80aa81b6efc048b9e5eb5fa806bfc4e12d99c753bd5b27e4"
+  },
+  "backend/src/modules/profiles/controller.ts": {
+    "bytes": 2387,
+    "sha256": "16b9a3b77b42861e2ee6d642024110e5eac9e96c09b1a5a469d2796042aa315e"
+  },
+  "backend/src/modules/profiles/repository.ts": {
+    "bytes": 829,
+    "sha256": "2283089fc96888031ce671d8a7aab0703ba875fbe35900b9565b1ec3a78f0716"
+  },
+  "backend/src/modules/profiles/service.ts": {
+    "bytes": 1620,
+    "sha256": "3dd40805bcb41a6784b278d89aa08af98246e8d129b6cc051cec522fcf30b881"
+  },
+  "backend/src/modules/progress/service.ts": {
+    "bytes": 3153,
+    "sha256": "1430c002228e92e0535fcde83b0fa280cf58e056eebbe2bd7545af698dafe7c8"
+  },
+  "backend/src/modules/push/service.ts": {
+    "bytes": 8418,
+    "sha256": "339840cb4bb447e2361226adb54c964e87adac9eec56ae02160a9fc776ee4a94"
+  },
+  "backend/src/modules/push/transport.ts": {
+    "bytes": 3319,
+    "sha256": "8ebd5bbb3a7ab4afac065fab4b008a1d7f557551112ba6457cb138f6eb1cd5f5"
+  },
+  "backend/src/modules/users/repository.ts": {
+    "bytes": 753,
+    "sha256": "a1348f29d46a5bba666fdd2b244e7db279aa0d3b0e152266c0c51b57af4a839a"
+  },
+  "backend/src/server.ts": {
+    "bytes": 1825,
+    "sha256": "1cde118803c3488da606896851fcc343ed269d78af52a820cbb7bb41ca8a068f"
+  },
+  "backend/src/validation.ts": {
+    "bytes": 1740,
+    "sha256": "8ff3a67035ab4220ab068f20a5f72dece0204ea904c31a1af48a8985c0d416bc"
+  },
+  "backend/src/worker.ts": {
+    "bytes": 1333,
+    "sha256": "d178e89c7b53d15330fdf3094d7800ea81739eef4e36c3b28d01e61c30d87246"
+  },
+  "backend/tests/engagement-integration.test.ts": {
+    "bytes": 14739,
+    "sha256": "1d6fe2ae1eeb5ef82ee6ef2d07dd69e4a0b4a41fa2f705be227237a83261aeb9"
+  },
+  "backend/tests/engagement-rules.test.ts": {
+    "bytes": 1342,
+    "sha256": "d97e883bfd919d56603b16cb4577611bdb756678216ef41c9fae951c83916a6d"
+  },
+  "backend/tests/fixtures/moodle-authorized-page.json": {
+    "bytes": 653,
+    "sha256": "47dfb4fa810668c3822404384eb0f98ab755c1bb5465e4a3638c2cfdc472662a"
+  },
+  "backend/tests/fixtures/moodle-expired-page.json": {
+    "bytes": 160,
+    "sha256": "c847174f83fea777cfca0b010d9fcdcb22bfc6c2f2637f297ab2165c5bd47573"
+  },
+  "backend/tests/integration.test.ts": {
+    "bytes": 14772,
+    "sha256": "c1edb07a86ae031cc1f7e5793db96b6c793d2d63acd32b11208a9c70eeaba35d"
+  },
+  "backend/tests/migration-readiness.test.ts": {
+    "bytes": 2040,
+    "sha256": "5635ecae19d813562807da6b8ed4a5d28e675280bed96e3cdd4dd80fdf9b49c5"
+  },
+  "backend/tests/phase7-integration.test.ts": {
+    "bytes": 25567,
+    "sha256": "e67f5194920b024f6c8d8709eef68559ab7eb3c426be5e86ec3ac4a54b166630"
+  },
+  "backend/tests/phase7-unit.test.ts": {
+    "bytes": 5037,
+    "sha256": "48268fd93944c7450057690bad0a8f4a0e4f336eb353c3c7e491f626383abb19"
+  },
+  "backend/tests/phase8b-integration.test.ts": {
+    "bytes": 11874,
+    "sha256": "0c931c3a561aaacaf9d7189f6b33ecd35e98360d7938681424bf7a0a2033c9ad"
+  },
+  "backend/tests/phase8b-service-worker.test.ts": {
+    "bytes": 1849,
+    "sha256": "ad1c88e2f9f2f60bae77805430573783fc0148ffee5cd7c3b99c612e23539341"
+  },
+  "backend/tests/phase8b-unit.test.ts": {
+    "bytes": 3668,
+    "sha256": "6d2e100e61e9e8a8e7c09c2baf9f0954721128b7773cde1824f3696bea444a06"
+  },
+  "backend/tests/planning-engine.test.ts": {
+    "bytes": 10056,
+    "sha256": "90a2e37a401f54e25f8ad590d24f908123141fd506da38f544bf45cb80173eb5"
+  },
+  "backend/tests/planning-integration.test.ts": {
+    "bytes": 11247,
+    "sha256": "eafd471df7a6bf2ecb83d91ebb6cc8a9917a4ac3b41860a6f640077771df8091"
+  },
+  "backend/tests/production-config.test.ts": {
+    "bytes": 1710,
+    "sha256": "4ef7cb9d7d9408e6706eab005d2f0728e44ea724f70aa3d3da908344f5d90900"
+  },
+  "backend/tests/production-restart.test.ts": {
+    "bytes": 2172,
+    "sha256": "27844d57e3b930ab225300fb75b384a113d438c9f28b3bc9e24d3225b8339607"
+  },
+  "backend/tests/productivity-integration.test.ts": {
+    "bytes": 18315,
+    "sha256": "94c0ee0e22516d6f65b7f1503c7d8ef0fb690f74d1b15ec25bd7d839703dde97"
+  },
+  "backend/tests/productivity-time.test.ts": {
+    "bytes": 1969,
+    "sha256": "7a6ef63af78613761bd0136be85d83bf1c0046d515a7a3952d81f7a6d252b8bd"
+  },
+  "backend/tests/services.test.ts": {
+    "bytes": 1937,
+    "sha256": "228cd41a53bad567f06381608f96cee99ee997c516596c982562ca8d6b244bb5"
+  },
+  "backend/tsconfig.json": {
+    "bytes": 245,
+    "sha256": "a8600c9a1ec703a835cbe7b0a703946dfd9d8bf78f12849a77c220cdf245faa7"
+  },
+  "backend/tsconfig.ops.json": {
+    "bytes": 180,
+    "sha256": "0b42c8771dfd0ec4e0baca1b48553cf7336d63d72fb2c1a63e81307d866068e6"
+  },
+  "data/seed.sql": {
+    "bytes": 299857,
+    "sha256": "de00a6ddba107e7c6f0e4c69b35ae7f67469d8c0904bcf81e12eec2a934dbb44"
+  },
+  "database/academic-curriculum.sql": {
+    "bytes": 313486,
+    "sha256": "cbd8490282557b60bbbbde50fc02d128d871d6442c27f3ca71383d3bc394e3bc"
+  },
+  "database/manifest.json": {
+    "bytes": 752,
+    "sha256": "85bad41ed0d97fe57e36b399c80277efe8524d2e0ed9bb5256e62a3ea3a866af"
+  },
+  "deploy/.env.example": {
+    "bytes": 469,
+    "sha256": "b3d582c6a2ea196061b6fc89520cb6c7f0d31554509a7c2dd7948a21ccc7780f"
+  },
+  "deploy/audit.mjs": {
+    "bytes": 3037,
+    "sha256": "593dd3cad2873116878bebf416c4163e307c360cf114d5d83ed5302bd9fd0669"
+  },
+  "deploy/backup.sh": {
+    "bytes": 905,
+    "sha256": "8a73acfdcce6f3476e76ecaf277bada0df2240c04a7c0b8e781a0ca2a004cdee"
+  },
+  "deploy/compose.push.example.yaml": {
+    "bytes": 843,
+    "sha256": "d21bdec0fc8d476bab88b015d9c28f5f9993c0c7268ec719bf3fa305bb6a73b4"
+  },
+  "deploy/compose.yaml": {
+    "bytes": 4441,
+    "sha256": "b3ae6bbd26d8e7aaa1344700930be93828de72ffa539ee8cff4da7a18c152612"
+  },
+  "deploy/db-admin.sh": {
+    "bytes": 2995,
+    "sha256": "6c39883f2b0e7e666aaf75529a0f9348348424981be68c39acd5eb79d99150ba"
+  },
+  "deploy/generate-push-keys.mjs": {
+    "bytes": 842,
+    "sha256": "1b9321622a15f7c37a518aa95bd3adb887c059f72861cbcb65bf391f3cf1d2d3"
+  },
+  "deploy/integrations.env.example": {
+    "bytes": 970,
+    "sha256": "afe840eb4748129683090a53ec5fee8eb49084527f3b0f3908e3f8acc6ca5d46"
+  },
+  "deploy/prepare-local.ps1": {
+    "bytes": 1020,
+    "sha256": "8bf396456ad1d128f24b0e5faf88fc5f8dc9dfffdf2c72e50c7c7243758c4e77"
+  },
+  "deploy/proxy.conf": {
+    "bytes": 1721,
+    "sha256": "e1339db07d341083022fcab619ba7bc235458a2688135ec129c5f64201dfbaeb"
+  },
+  "deploy/restore-empty.sh": {
+    "bytes": 1203,
+    "sha256": "a5770463c5473c76d5572a456db4ce02613d0d0cfd8c1f670f43e0f8e517cfb6"
+  },
+  "deploy/smoke.mjs": {
+    "bytes": 1573,
+    "sha256": "340f96ecb3173ad449fd5dbc7210cede389435636fb3aa279ecec13c1769c93c"
+  },
+  "frontend/.dockerignore": {
+    "bytes": 172,
+    "sha256": "2066ef89f00affdc66ecbb968cdb42751a6cd453bc0dfaab8ee7f508a8f1c688"
+  },
+  "frontend/.env.example": {
+    "bytes": 38,
+    "sha256": "9c7e00fa573680e2d93d686042205fc3068989c1ce737e1b4b4f0ab000a4d404"
+  },
+  "frontend/Dockerfile": {
+    "bytes": 587,
+    "sha256": "21f9564c710ba481a88ce75711a3b036d536a507eb13c5116207a7f8bec0d088"
+  },
+  "frontend/index.html": {
+    "bytes": 624,
+    "sha256": "acd449e02b651dcb6ee29a5497c0c8a07bf0f37fab3b0350350b890c2fdd4b23"
+  },
+  "frontend/nginx.conf": {
+    "bytes": 343,
+    "sha256": "13d4998eab407a84ed23315aca986684daf47b342e2269038d8731fac6a10190"
+  },
+  "frontend/package.json": {
+    "bytes": 826,
+    "sha256": "92504096977b37934f50425b36f2d585a0e55658161b4358f4caf7f87ebe8067"
+  },
+  "frontend/pnpm-lock.yaml": {
+    "bytes": 107763,
+    "sha256": "81a00305837b7fc26e672ccc89c7873fa7090349240ff8d985059da46b371632"
+  },
+  "frontend/pnpm-workspace.yaml": {
+    "bytes": 29,
+    "sha256": "ac02d96368617c760f093cfe61fdec64b6244007ab3553e0d6621f706f54a353"
+  },
+  "frontend/public/app-icon.svg": {
+    "bytes": 299,
+    "sha256": "9697a613c6c0a10a7f16d86a65893e4c70d9166a35720eb80e0edab4592a62ea"
+  },
+  "frontend/public/manifest.webmanifest": {
+    "bytes": 321,
+    "sha256": "bb497c28329dfa06ad0b40dfa04024c1097d42c1e65ff8ea6c8b253d28b0b8cb"
+  },
+  "frontend/public/sw.js": {
+    "bytes": 1989,
+    "sha256": "1bcb3c3fb82b8818903fe7e9c6cdf24b96e3fa10c4b34140c21e66a7ddcdd1f9"
+  },
+  "frontend/README.md": {
+    "bytes": 297,
+    "sha256": "a3e93e4aac7628f03340dd79c5e7b184d2fd54b1af69683bda066557e04ddc32"
+  },
+  "frontend/scripts/run.ps1": {
+    "bytes": 1200,
+    "sha256": "27496f729c7ed07bc500e560764032baee2ca8406da462533436471d1c8a2701"
+  },
+  "frontend/src/api/client.ts": {
+    "bytes": 9288,
+    "sha256": "f5c96e29a5509cf795bef9105ac4815ae56813387367afff9b58f304fa9d2fb1"
+  },
+  "frontend/src/api/planning.ts": {
+    "bytes": 2351,
+    "sha256": "2db9e15b1b6f2ef5bd329085ca8a52c354df179d7c5a4854b7de9d45143e5bbd"
+  },
+  "frontend/src/api/productivity.ts": {
+    "bytes": 2689,
+    "sha256": "54d368c6bc8f79b14777d5bd87fc799559039ae0de7f504771c7c2dcac3769e4"
+  },
+  "frontend/src/api/types.ts": {
+    "bytes": 3399,
+    "sha256": "7f01736b765dba8a8bdc06777ba80d10796fa66956e23e431a70bcf99d6d0fb2"
+  },
+  "frontend/src/App.tsx": {
+    "bytes": 3814,
+    "sha256": "730cb9c6d349a5ca8f04718bd913697459fee425d40d1ba4523cb37f0092ccc9"
+  },
+  "frontend/src/components/Layout.tsx": {
+    "bytes": 6478,
+    "sha256": "76147bec43742404a0fa93d67ca1570c87d47a862d7a73ec6bc907a7f2e8ab97"
+  },
+  "frontend/src/components/ui.tsx": {
+    "bytes": 5420,
+    "sha256": "f3f9c43157fbffd4cee2971fdcc1f4b49a42779da73cdbce8370cc9f0022f739"
+  },
+  "frontend/src/engagement/Engagement.tsx": {
+    "bytes": 17853,
+    "sha256": "1489ae14e98f376b2bccd9affff0690bc2cd86aa02ff1f79122c133cb2b7d052"
+  },
+  "frontend/src/engagement/styles.css": {
+    "bytes": 3196,
+    "sha256": "e608bd7938136c0dac6513103063c855fd1688bcb950cd04420ba126a081a4fb"
+  },
+  "frontend/src/hooks.ts": {
+    "bytes": 1125,
+    "sha256": "d92db26c3da0b84be4bb63d9b6009efb09a729a2cfc708b546ebd4bf962228c9"
+  },
+  "frontend/src/integrations/Assistant.tsx": {
+    "bytes": 13310,
+    "sha256": "7780ddf003766bd144ea74bade85c4e667b30edf86508fd3fc5e1af74b093f61"
+  },
+  "frontend/src/integrations/hooks.ts": {
+    "bytes": 673,
+    "sha256": "3dced29e1b32d5937a82ad7ce343437ad3f1901c3b5d6ff0a7120aa6e5888350"
+  },
+  "frontend/src/integrations/Moodle.tsx": {
+    "bytes": 10003,
+    "sha256": "bd8775152d1a2bde3513fdd0966e984c2d0b1c33e4240cd41c08d5bcbb0ae517"
+  },
+  "frontend/src/integrations/PushSettings.tsx": {
+    "bytes": 4555,
+    "sha256": "1edfcff129ced4a296dee3a65e7a07fb60d2297d4754267916c5a280da613bd0"
+  },
+  "frontend/src/integrations/styles.css": {
+    "bytes": 4429,
+    "sha256": "752aff313fe952060e3f7f9d5f354864a1801ca6c7d637a1b2473bcaa7fe5037"
+  },
+  "frontend/src/integrations/types.ts": {
+    "bytes": 2062,
+    "sha256": "7d8540466b7074424bc45ba670b7fc9354312031f68ae16335390509edb2de49"
+  },
+  "frontend/src/main.tsx": {
+    "bytes": 203,
+    "sha256": "f4d38c986cbd160d6c5cc18824f90fc25e623a061e966165dc4629b77a5f695f"
+  },
+  "frontend/src/pages/Academic.tsx": {
+    "bytes": 25140,
+    "sha256": "e4942c01a495e6946855df432422b214c29a7e6ea1fc2231061c28370522ea7c"
+  },
+  "frontend/src/pages/Auth.tsx": {
+    "bytes": 12417,
+    "sha256": "321a4b8b2179cb76235d1e641cdcfd57bbf720a3372b1e72adc4445d1b5893fd"
+  },
+  "frontend/src/pages/Future.tsx": {
+    "bytes": 2243,
+    "sha256": "393c557e9c7865bbced366a81f95da673fc6cf1f3b90978c1b4f1276db8d608e"
+  },
+  "frontend/src/pages/Planning.tsx": {
+    "bytes": 26787,
+    "sha256": "cde2a2ad803b5deeb3dfc95ccf374b2f92765fbbb7f200e11dfbc58f193f9a9d"
+  },
+  "frontend/src/pages/Profile.tsx": {
+    "bytes": 7525,
+    "sha256": "91f9ee926c8ad9a5f0264b16734e3bdf04ce50c773b3f67e54c6f75058050351"
+  },
+  "frontend/src/productivity/Calendar.tsx": {
+    "bytes": 13923,
+    "sha256": "8a0645bc262accd22117095db86837eadec75d6cde628dbf14fe0317a3fbddf6"
+  },
+  "frontend/src/productivity/hooks.ts": {
+    "bytes": 1540,
+    "sha256": "4499872191592ba52577bc71b1d3c1a42ca4487d8d854708b2567267dd0538bc"
+  },
+  "frontend/src/productivity/Notifications.tsx": {
+    "bytes": 7834,
+    "sha256": "8ce3eb89d39cd27438b4db6b1f80927c7fbd1e22b54cc9cf591f2099418cbc36"
+  },
+  "frontend/src/productivity/Pomodoro.tsx": {
+    "bytes": 14406,
+    "sha256": "dcccd57eeba1ada73858144b08e73afaf21dbfec69036dec0c861de24fde2397"
+  },
+  "frontend/src/productivity/styles.css": {
+    "bytes": 10670,
+    "sha256": "abfb32e94da5d514d78c4db6c0d6b694bd73acdac8078016ed19f1d8622d951c"
+  },
+  "frontend/src/productivity/Tasks.tsx": {
+    "bytes": 14430,
+    "sha256": "33bd3712f918d3356ff48f174e6c0ac74ba510fba9155e88efe1ac195efd0841"
+  },
+  "frontend/src/productivity/time.ts": {
+    "bytes": 2819,
+    "sha256": "701ef86ad106bf654090dad77814d1cdaa6216c32a45ca50874bbec3e6bd687c"
+  },
+  "frontend/src/state.tsx": {
+    "bytes": 2063,
+    "sha256": "b10d0460e18d420788bf0464349f63a7c07a2d98b1d54d675bef943d3110463a"
+  },
+  "frontend/src/styles.css": {
+    "bytes": 30549,
+    "sha256": "30322208a9c4b09f91891ae58dd8bc6d1f03aecf7d462cfd381c7094fdaeab31"
+  },
+  "frontend/src/test/client.test.ts": {
+    "bytes": 2577,
+    "sha256": "7c656907ec09db1250a1fc326d1b3bd1b0eebe87055221ed355f6684abd78996"
+  },
+  "frontend/src/test/engagement.test.tsx": {
+    "bytes": 7409,
+    "sha256": "147e22c59588e7ea2142d2fb3c6443b376f538df192b75d93ab5587d48b3f617"
+  },
+  "frontend/src/test/phase7.test.tsx": {
+    "bytes": 11214,
+    "sha256": "e2a7e7534a0e31cf00201c2958fa886375d84314f87b47d9d01eada4b0d99ac9"
+  },
+  "frontend/src/test/planning.test.tsx": {
+    "bytes": 3378,
+    "sha256": "4732930af7bc5c862707162f8bc59532c4b9100d460b978446471788777f201b"
+  },
+  "frontend/src/test/prerequisites.test.tsx": {
+    "bytes": 2866,
+    "sha256": "5df24b5ed70fbf4163906b66623f6a3f3a7a5d8c77deb843b967ed7631d1950a"
+  },
+  "frontend/src/test/productivity.test.tsx": {
+    "bytes": 10324,
+    "sha256": "9e771aeca5fcb3ef2662b6d64860362655a788e644e5851e848503796026a317"
+  },
+  "frontend/src/test/push.test.tsx": {
+    "bytes": 3144,
+    "sha256": "f048c2339391fdc69b52d0f15910f2d1fcb721ce51a51ee65f9ce149d12ceb56"
+  },
+  "frontend/src/test/session.test.tsx": {
+    "bytes": 1372,
+    "sha256": "62e03654459572616f6a87c34e10a9104864f7a16a54034444057df9028441d7"
+  },
+  "frontend/src/test/setup.ts": {
+    "bytes": 407,
+    "sha256": "09014895e751459fa6a41943e2862b745c1ab1bd7eaa8b3e17046ca1fa7196aa"
+  },
+  "frontend/src/test/validation.test.tsx": {
+    "bytes": 1555,
+    "sha256": "9df935a6cdb20fccd91eaa0656ae51a6c9b66a335838a304a1f86675e9922a6e"
+  },
+  "frontend/tsconfig.json": {
+    "bytes": 292,
+    "sha256": "349ce68e07f5847e8e517d0184777587e1eb04750c084ead3d3e8df459c68f1c"
+  },
+  "frontend/vite.config.ts": {
+    "bytes": 435,
+    "sha256": "a12f05aa93942b952544cacf50ba8e14125dda00e6d6f53aa60b375238a6fcbb"
+  },
+  "frontend/vitest.config.ts": {
+    "bytes": 233,
+    "sha256": "3f570dc773e249d862a4890b03bbddfe038abb526a5cb2d8520de4edbbe37f78"
+  },
+  "migrations/001_academic.sql": {
+    "bytes": 9065,
+    "sha256": "045dc515189469d1eb2f074d0b9f1b7dc0911f5c9f5b13081d51b1d75c9128fb"
+  },
+  "PACKAGE-VERIFICATION.json": {
+    "bytes": 384,
+    "sha256": "cfbfdbf519a1468c3ce2c6dc702cefc1c95a2b4ff9014d1b4163c693e16fba08"
+  },
+  "README.md": {
+    "bytes": 10423,
+    "sha256": "6a405258bf4554348b1ea0419f0878068aaee68217b20542fea0769a464c5147"
+  },
+  "SECURITY-AND-VERIFICATION.md": {
+    "bytes": 5367,
+    "sha256": "ceaf4e6839624d7f17df09240c1ddee50b95f7add0b6c12aa4c187bbe83260c5"
+  },
+  "team-tools/setup-local.mjs": {
+    "bytes": 4785,
+    "sha256": "92210eda5bf8d51b2b1cef77d376e42c2eae18a570eade85d81d13d45759b017"
+  },
+  "team-tools/setup-local.ps1": {
+    "bytes": 1283,
+    "sha256": "a1ca47b8161eb1797ad7b1fe11a5bd464588b4d048fc9b5b457a2f33db7dfe78"
+  }
+}

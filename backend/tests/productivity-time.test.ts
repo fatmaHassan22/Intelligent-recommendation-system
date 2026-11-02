@@ -1,0 +1,9 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {deadline,localInstant,dayRange,remainingMs,dayKey,isoDate,validTimezone} from '../src/modules/productivity/time.js';
+import {taskSchema,eventSchema} from '../src/modules/productivity/validation.js';
+test('Date-only deadline is the end of its own local day, not midnight UTC',()=>{const d=deadline('2026-10-11',null,'Asia/Hebron')!;assert.equal(dayKey(d,'Asia/Hebron'),'2026-10-11');assert.equal(d.getUTCMilliseconds(),999);assert.ok(d.toISOString().includes('20:59:59')||d.toISOString().includes('21:59:59'));});
+test('Timezone day boundaries handle both 23 and 25 hour DST days',()=>{for(const [day,hours] of [['2026-03-29',23],['2026-10-25',25]] as const){const r=dayRange(new Date(day+'T12:00Z'),'Europe/Berlin');assert.equal(r.to.getTime()-r.from.getTime(),hours*3600000);}});
+test('Nonexistent local clock times are rejected rather than silently shifted',()=>{assert.throws(()=>localInstant('2026-03-29','02:30','Europe/Berlin'));assert.equal(validTimezone('Invalid/Zone'),false);});
+test('Running timer uses absolute deadline, paused timer keeps exact milliseconds',()=>{assert.equal(remainingMs({state:'RUNNING',remaining_ms:60000,ends_at:'2026-10-11 08:01:00.000'},new Date('2026-10-11T08:00:10.250Z')),49750);assert.equal(remainingMs({state:'PAUSED',remaining_ms:49750,ends_at:null},new Date('2026-10-12T08:00Z')),49750);assert.equal(remainingMs({state:'CANCELLED',remaining_ms:49750,ends_at:null},new Date()),0);assert.equal(isoDate('2026-10-11 08:01:00.000'),'2026-10-11T08:01:00.000Z');});
+test('Invalid dates, time without date and reversed events fail validation',()=>{assert.equal(taskSchema.safeParse({title:'مهمة',due_date:'2026-02-30'}).success,false);assert.equal(taskSchema.safeParse({title:'مهمة',due_time:'12:00'}).success,false);assert.equal(eventSchema.safeParse({title:'حدث',start_at:'2026-10-11T10:00Z',end_at:'2026-10-11T09:00Z'}).success,false);});

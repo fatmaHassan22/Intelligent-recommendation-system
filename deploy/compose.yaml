@@ -1,0 +1,143 @@
+name: academic-support-prod-sim
+x-logging: &logging
+  driver: json-file
+  options: {max-size: '10m', max-file: '3'}
+x-app-env: &app-env
+  NODE_ENV: production
+  HOST: 0.0.0.0
+  PORT: '3000'
+  DB_HOST: db
+  DB_PORT: '3306'
+  DB_NAME: academic_support
+  DB_USER: academic_app
+  DB_PASSWORD_FILE: /run/secrets/app_password
+  CSRF_SECRET_FILE: /run/secrets/csrf_secret
+  CORS_ORIGINS: ${PUBLIC_ORIGIN:?Set PUBLIC_ORIGIN to an exact HTTPS origin}
+  COOKIE_SECURE: 'true'
+  COOKIE_SAME_SITE: lax
+  TRUST_PROXY_HOPS: '1'
+  BCRYPT_ROUNDS: '12'
+  MOODLE_SYNC_ENABLED: 'false'
+  MOODLE_SYNC_INTERVAL_MINUTES: '360'
+  BACKGROUND_JOBS_ENABLED: 'false'
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: academic_support
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/root_password
+      MYSQL_USER: academic_migrator
+      MYSQL_PASSWORD_FILE: /run/secrets/migrator_password
+    secrets: [root_password, migrator_password, app_password]
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db-admin.sh:/opt/db-admin.sh:ro
+    networks: [database]
+    restart: unless-stopped
+    stop_grace_period: 120s
+    mem_limit: 1536m
+    logging: *logging
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping --host=127.0.0.1 --silent']
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_0900_as_cs', '--innodb-buffer-pool-size=256M', '--max-connections=60', '--default-time-zone=+00:00']
+  migrate:
+    profiles: [tools]
+    image: academic-support-backend:local
+    build: ../backend
+    environment:
+      <<: *app-env
+      DB_USER: academic_migrator
+      DB_PASSWORD_FILE: /run/secrets/migrator_password
+    secrets: [migrator_password, csrf_secret]
+    command: ['node', 'dist-ops/scripts/production-migrate.js']
+    volumes:
+      - ../migrations/001_academic.sql:/bootstrap/academic.sql:ro
+      - ../data/seed.sql:/bootstrap/catalog.sql:ro
+    depends_on:
+      db: {condition: service_healthy}
+    networks: [database]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    logging: *logging
+  backend:
+    image: academic-support-backend:local
+    build: ../backend
+    environment: *app-env
+    secrets: [app_password, csrf_secret]
+    depends_on:
+      db: {condition: service_healthy}
+    networks: [database, application]
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 150s
+    read_only: true
+    tmpfs: ['/tmp:size=32m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    logging: *logging
+  worker:
+    image: academic-support-backend:local
+    build: ../backend
+    command: ['node', 'dist/worker.js']
+    environment:
+      <<: *app-env
+      BACKGROUND_JOBS_ENABLED: 'true'
+    secrets: [app_password, csrf_secret]
+    depends_on:
+      db: {condition: service_healthy}
+    networks: [database, application]
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 150s
+    read_only: true
+    tmpfs: ['/tmp:size=32m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    logging: *logging
+    healthcheck:
+      test: ['CMD', 'node', '-e', "const fs=require('node:fs');process.exit(Date.now()-Number(fs.readFileSync('/tmp/worker-heartbeat','utf8'))<90000?0:1)"]
+      interval: 30s
+      start_period: 30s
+      timeout: 5s
+      retries: 3
+  frontend:
+    build: ../frontend
+    networks: [application]
+    restart: unless-stopped
+    read_only: true
+    tmpfs: ['/tmp:size=32m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    logging: *logging
+  proxy:
+    image: nginxinc/nginx-unprivileged:1.28-alpine
+    ports: ['${HTTPS_BIND_ADDRESS:-127.0.0.1}:${HTTPS_PORT:-8443}:8443']
+    volumes:
+      - ./proxy.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./tls:/etc/nginx/tls:ro
+    depends_on: [backend, frontend]
+    networks: [application]
+    restart: unless-stopped
+    read_only: true
+    tmpfs: ['/tmp:size=32m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    logging: *logging
+networks:
+  database: {internal: true}
+  application: {}
+volumes:
+  mysql_data: {}
+secrets:
+  root_password: {file: ./secrets/root_password}
+  migrator_password: {file: ./secrets/migrator_password}
+  app_password: {file: ./secrets/app_password}
+  csrf_secret: {file: ./secrets/csrf_secret}

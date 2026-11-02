@@ -1,0 +1,26 @@
+{
+  "exportedAt": "2026-10-25T17:57:24.346Z",
+  "source": "Local MySQL only; read-only consistent snapshot",
+  "tables": {
+    "majors": 3,
+    "curriculum_plans": 3,
+    "courses": 82,
+    "requirement_categories": 1,
+    "curriculum_courses": 116,
+    "prerequisite_groups": 66,
+    "course_prerequisites": 66,
+    "elective_groups": 2,
+    "elective_group_courses": 23,
+    "semester_definitions": 2,
+    "academic_years": 0,
+    "academic_terms": 0,
+    "course_offerings": 0,
+    "course_academic_metadata": 0,
+    "course_typical_semesters": 94,
+    "data_verification_issues": 96,
+    "seed_runs": 1
+  },
+  "academicOnly": true,
+  "foreignKeysValidated": true,
+  "sqlSha256": "cbd8490282557b60bbbbde50fc02d128d871d6442c27f3ca71383d3bc394e3bc"
+}

@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS planner_offering_evidence (
+ course_offering_id BIGINT UNSIGNED PRIMARY KEY,
+ source_reference VARCHAR(512) NOT NULL,
+ verification_status ENUM('VERIFIED_OFFICIAL_SOURCE') NOT NULL,
+ verified_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ CHECK (CHAR_LENGTH(TRIM(source_reference)) > 0),
+ FOREIGN KEY(course_offering_id) REFERENCES course_offerings(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_as_cs;

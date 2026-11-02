@@ -1,0 +1,11 @@
+**/node_modules/
+**/dist/
+**/dist-ops/
+**/*.tsbuildinfo
+**/.env
+**/.env.*
+!**/.env.example
+!**/integrations.env.example
+**/secrets/
+**/tls/
+*.log

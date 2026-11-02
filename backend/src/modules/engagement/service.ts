@@ -1,0 +1,25 @@
+import {createHash} from 'node:crypto';
+import {rows,write,type Executor} from '../../db.js';
+import {dayKey,isoDate,sqlDate} from '../productivity/time.js';
+import {notify,preferences as reminderPreferences} from '../productivity/notifications.js';
+import {calculateStreak,categories,defaultAvatar} from './rules.js';
+export async function engagementPreferences(db:Executor,user:string):Promise<{timezone:string;notification_tone:string;achievement_notifications:boolean;ticker_visible:boolean;ticker_categories:string[]}>{const r=(await rows(db,'SELECT timezone,notification_tone,achievement_notifications,ticker_visible,ticker_categories FROM student_engagement_preferences WHERE user_id=?',[user]))[0];const timezone=(await reminderPreferences(db,user)).timezone;if(!r)return {timezone,notification_tone:'PROFESSIONAL',achievement_notifications:true,ticker_visible:true,ticker_categories:[...categories]};return {...r,timezone:String(r.timezone),notification_tone:String(r.notification_tone),achievement_notifications:!!r.achievement_notifications,ticker_visible:!!r.ticker_visible,ticker_categories:typeof r.ticker_categories==='string'?JSON.parse(r.ticker_categories):r.ticker_categories};}
+export async function ensurePreferences(db:Executor,user:string){const p=await engagementPreferences(db,user);await write(db,'INSERT INTO student_engagement_preferences(user_id,timezone,ticker_categories) VALUES(?,?,?) ON DUPLICATE KEY UPDATE user_id=user_id',[user,p.timezone,JSON.stringify(categories)]);await rows(db,'SELECT user_id FROM student_engagement_preferences WHERE user_id=? FOR UPDATE',[user]);}
+export async function streaks(db:Executor,user:string,now:Date){const p=await engagementPreferences(db,user),dates=await rows(db,'SELECT DISTINCT activity_date FROM student_activity_events WHERE user_id=? ORDER BY activity_date',[user]);return {...calculateStreak(dates.map(d=>String(d.activity_date)),dayKey(now,p.timezone)),timezone:p.timezone,message:dates.length?'استمراريتك تُبنى بخطواتك، واليوم فرصة جديدة.':'ابدئي بمهمة أو جلسة تركيز؛ زيارة الصفحة وحدها لا تُحسب.',history_note:'كل يوم نشاط يحتفظ بالمنطقة الزمنية المسجلة وقت النشاط؛ تغيير المنطقة لا يعيد كتابة التاريخ.'};}
+export async function achievements(db:Executor,user:string,now:Date):Promise<Record<string,any>[]>{const counts=await rows(db,'SELECT kind,COUNT(*) AS total FROM student_activity_events WHERE user_id=? GROUP BY kind',[user]);const metrics:Record<string,number>=Object.fromEntries(counts.map(r=>[r.kind,Number(r.total)]));metrics.STREAK=(await streaks(db,user,now)).longest_streak;return (await rows(db,'SELECT d.*,a.earned_at,a.celebrated_at FROM achievement_definitions d LEFT JOIN student_achievements a ON a.achievement_code=d.code AND a.user_id=? ORDER BY d.sort_order',[user])).map(r=>({...r,target:Number(r.target),progress:Math.min(Number(r.target),metrics[r.metric]??0),earned_at:isoDate(r.earned_at),celebrated_at:isoDate(r.celebrated_at)}));}
+export async function recordActivity(db:Executor,user:string,kind:'TASK'|'FOCUS'|'PLAN'|'COURSE',source:string,key:string,now:Date){
+ await ensurePreferences(db,user);if((await rows(db,'SELECT id FROM student_activity_events WHERE user_id=? AND event_key=?',[user,key])).length)return;
+ const p=await engagementPreferences(db,user),previous=await streaks(db,user,now);
+ await write(db,'INSERT INTO student_activity_events(user_id,event_key,kind,source_id,occurred_at,activity_date,timezone) VALUES(?,?,?,?,?,?,?)',[user,key,kind,source,sqlDate(now),dayKey(now,p.timezone),p.timezone]);
+ const list=await achievements(db,user,now);
+ for(const a of list){if(a.earned_at||a.progress<a.target)continue;await write(db,'INSERT INTO student_achievements(user_id,achievement_code,earned_at) VALUES(?,?,?)',[user,a.code,sqlDate(now)]);if(p.achievement_notifications)await notify(db,user,'ACHIEVEMENT:'+a.code,'ACHIEVEMENT','شارة جديدة: '+a.title,a.description,now);}
+ const after=await streaks(db,user,now);for(const target of [3,7,14,30,60,100])if(previous.longest_streak<target&&after.longest_streak>=target&&p.achievement_notifications)await notify(db,user,'STREAK:'+target,'STREAK_MILESTONE',`${target} أيام من الاستمرارية`,'أنجزتِ نشاطًا ذا معنى في أيام متتالية. احتفلي بخطواتك دون ضغط.',now);
+}
+export async function recordPlan(db:Executor,user:string,id:string,now:Date){
+ const courses=await rows(db,'SELECT course_id FROM student_semester_plan_courses WHERE semester_plan_id=? ORDER BY course_id',[id]);if(!courses.length)return;
+ const draft=(await rows(db,'SELECT curriculum_plan_id,academic_term_id,study_mode FROM student_semester_plans WHERE id=? AND user_id=?',[id,user]))[0];
+ const hash=createHash('sha256').update(JSON.stringify([draft,courses])).digest('hex');await recordActivity(db,user,'PLAN',id,`PLAN:${id}:${hash}`,now);
+}
+export async function avatar(db:Executor,user:string){return (await rows(db,'SELECT style,color,background,eyes,accessory FROM student_avatar_preferences WHERE user_id=?',[user]))[0]??{...defaultAvatar};}
+export const safeUrl=(value:string)=>{try{const u=new URL(value);return ['http:','https:'].includes(u.protocol)&&!u.username&&!u.password;}catch{return false;}};
+

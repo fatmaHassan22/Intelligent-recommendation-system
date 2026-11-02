@@ -1,0 +1,1 @@
+{"extends":"./tsconfig.json","compilerOptions":{"rootDir":".","outDir":"dist-ops"},"include":["scripts/production-migrate.ts","scripts/migrations.ts","src/config.ts","src/db.ts"]}

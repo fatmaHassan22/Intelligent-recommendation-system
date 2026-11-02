@@ -1,0 +1,14 @@
+**
+!package.json
+!pnpm-lock.yaml
+!tsconfig.json
+!tsconfig.ops.json
+!src/
+!src/**
+!scripts/
+!scripts/migrations.ts
+!scripts/production-migrate.ts
+!migrations/
+!migrations/*.sql
+!Dockerfile
+!.dockerignore

@@ -1,0 +1,18 @@
+# Copy to a private override only after generating keys and configuring HTTPS.
+# docker compose -f compose.yaml -f compose.push.local.yaml up -d
+services:
+  backend:
+    environment: &push-env
+      PUSH_ENABLED: 'true'
+      PUSH_ENCRYPTION_KEY_FILE: /run/secrets/push_encryption_key
+      VAPID_PUBLIC_KEY_FILE: /run/secrets/vapid_public_key
+      VAPID_PRIVATE_KEY_FILE: /run/secrets/vapid_private_key
+      VAPID_SUBJECT: ${VAPID_SUBJECT:?Set a real mailto contact for VAPID}
+    secrets: [push_encryption_key, vapid_public_key, vapid_private_key]
+  worker:
+    environment: *push-env
+    secrets: [push_encryption_key, vapid_public_key, vapid_private_key]
+secrets:
+  push_encryption_key: {file: ./secrets/push_encryption_key}
+  vapid_public_key: {file: ./secrets/vapid_public_key}
+  vapid_private_key: {file: ./secrets/vapid_private_key}

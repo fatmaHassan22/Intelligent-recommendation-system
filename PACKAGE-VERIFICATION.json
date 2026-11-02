@@ -1,0 +1,12 @@
+{
+  "verifiedAt": "2026-10-25T18:00:16.792Z",
+  "originalCopiedSourceFilesUnchanged": 174,
+  "files": 188,
+  "sqlTables": 17,
+  "sqlRows": 555,
+  "sqlAllowlistAndDecodedValuesVerified": true,
+  "foreignKeysValidated": true,
+  "secretScanFindings": 0,
+  "databaseImportTestRun": false,
+  "reason": "No database writes permitted; read-only snapshot plus static SQL verification only."
+}

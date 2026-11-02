@@ -1,0 +1,153 @@
+CREATE TABLE IF NOT EXISTS majors (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ code VARCHAR(16) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE,
+ name_ar VARCHAR(255) NOT NULL, name_en VARCHAR(255) NULL,
+ is_active BOOLEAN NOT NULL DEFAULT TRUE,
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS curriculum_plans (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, major_id BIGINT UNSIGNED NOT NULL,
+ plan_number SMALLINT UNSIGNED NOT NULL, total_credit_hours SMALLINT UNSIGNED NULL,
+ verification_status VARCHAR(32) NOT NULL DEFAULT 'UNVERIFIED',
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ UNIQUE (major_id, plan_number), CHECK (plan_number > 0), CHECK (total_credit_hours > 0),
+ FOREIGN KEY (major_id) REFERENCES majors(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS courses (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ course_code VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE,
+ name_ar VARCHAR(255) NOT NULL, name_en VARCHAR(255) NULL,
+ credit_hours SMALLINT UNSIGNED NULL, level SMALLINT UNSIGNED NULL,
+ verification_status VARCHAR(32) NOT NULL DEFAULT 'UNVERIFIED',
+ is_active BOOLEAN NOT NULL DEFAULT TRUE,
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ CHECK (credit_hours > 0), CHECK (level > 0), CHECK (CHAR_LENGTH(TRIM(name_ar)) > 0)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS requirement_categories (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ code VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE,
+ name_ar VARCHAR(255) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS curriculum_courses (
+ curriculum_plan_id BIGINT UNSIGNED NOT NULL, course_id BIGINT UNSIGNED NOT NULL,
+ requirement_type ENUM('REQUIRED','ELECTIVE','UNVERIFIED') NOT NULL DEFAULT 'UNVERIFIED',
+ requirement_category_id BIGINT UNSIGNED NULL,
+ source_name_ar VARCHAR(255) NOT NULL,
+ prerequisite_status ENUM('NONE','SPECIFIED','UNVERIFIED') NOT NULL DEFAULT 'UNVERIFIED',
+ verification_status VARCHAR(32) NOT NULL DEFAULT 'UNVERIFIED',
+ notes TEXT NULL,
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ PRIMARY KEY (curriculum_plan_id, course_id), INDEX (course_id),
+ FOREIGN KEY (curriculum_plan_id) REFERENCES curriculum_plans(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+ FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+ FOREIGN KEY (requirement_category_id) REFERENCES requirement_categories(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS prerequisite_groups (
+ curriculum_plan_id BIGINT UNSIGNED NOT NULL, course_id BIGINT UNSIGNED NOT NULL,
+ group_number SMALLINT UNSIGNED NOT NULL,
+ alternatives_operator ENUM('OR') NOT NULL DEFAULT 'OR',
+ verification_status VARCHAR(32) NOT NULL DEFAULT 'VERIFIED_USER_SOURCE',
+ PRIMARY KEY (curriculum_plan_id, course_id, group_number), CHECK (group_number > 0),
+ FOREIGN KEY (curriculum_plan_id,course_id) REFERENCES curriculum_courses(curriculum_plan_id,course_id) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS course_prerequisites (
+ curriculum_plan_id BIGINT UNSIGNED NOT NULL, course_id BIGINT UNSIGNED NOT NULL,
+ group_number SMALLINT UNSIGNED NOT NULL, prerequisite_course_id BIGINT UNSIGNED NOT NULL,
+ PRIMARY KEY (curriculum_plan_id,course_id,group_number,prerequisite_course_id),
+ INDEX (prerequisite_course_id), CHECK (course_id <> prerequisite_course_id),
+ FOREIGN KEY (curriculum_plan_id,course_id,group_number) REFERENCES prerequisite_groups(curriculum_plan_id,course_id,group_number) ON DELETE RESTRICT ON UPDATE RESTRICT,
+ FOREIGN KEY (prerequisite_course_id) REFERENCES courses(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS elective_groups (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, curriculum_plan_id BIGINT UNSIGNED NOT NULL,
+ code VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL, name_ar VARCHAR(255) NOT NULL,
+ required_credit_hours SMALLINT UNSIGNED NULL, required_course_count SMALLINT UNSIGNED NULL,
+ verification_status VARCHAR(32) NOT NULL DEFAULT 'VERIFIED_USER_SOURCE',
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ UNIQUE (curriculum_plan_id,code), UNIQUE (curriculum_plan_id,id),
+ CHECK (required_credit_hours > 0), CHECK (required_course_count > 0),
+ CHECK (required_credit_hours IS NOT NULL OR required_course_count IS NOT NULL),
+ FOREIGN KEY (curriculum_plan_id) REFERENCES curriculum_plans(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS elective_group_courses (
+ curriculum_plan_id BIGINT UNSIGNED NOT NULL, elective_group_id BIGINT UNSIGNED NOT NULL,
+ course_id BIGINT UNSIGNED NOT NULL,
+ PRIMARY KEY (curriculum_plan_id,elective_group_id,course_id), INDEX (course_id),
+ FOREIGN KEY (curriculum_plan_id,elective_group_id) REFERENCES elective_groups(curriculum_plan_id,id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+ FOREIGN KEY (curriculum_plan_id,course_id) REFERENCES curriculum_courses(curriculum_plan_id,course_id) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS semester_definitions (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ code VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE,
+ name_ar VARCHAR(255) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS academic_years (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, code VARCHAR(32) NOT NULL UNIQUE,
+ start_date DATE NULL, end_date DATE NULL, CHECK (end_date >= start_date)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS academic_terms (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, academic_year_id BIGINT UNSIGNED NOT NULL,
+ semester_definition_id BIGINT UNSIGNED NOT NULL,
+ UNIQUE (academic_year_id,semester_definition_id),
+ FOREIGN KEY (academic_year_id) REFERENCES academic_years(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+ FOREIGN KEY (semester_definition_id) REFERENCES semester_definitions(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS course_offerings (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, academic_term_id BIGINT UNSIGNED NOT NULL,
+ course_id BIGINT UNSIGNED NOT NULL, is_offered BOOLEAN NOT NULL,
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ UNIQUE (academic_term_id,course_id), INDEX (course_id), CHECK (is_offered IN (0,1)),
+ FOREIGN KEY (academic_term_id) REFERENCES academic_terms(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+ FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS course_academic_metadata (
+ course_id BIGINT UNSIGNED PRIMARY KEY,
+ difficulty_level VARCHAR(32) NULL, course_type VARCHAR(32) NULL, required_device VARCHAR(32) NULL,
+ source_reference VARCHAR(255) NOT NULL, verification_status VARCHAR(32) NOT NULL DEFAULT 'UNVERIFIED',
+ updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+ FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS course_typical_semesters (
+ course_id BIGINT UNSIGNED NOT NULL, semester_definition_id BIGINT UNSIGNED NOT NULL,
+ source_reference VARCHAR(255) NOT NULL, verification_status VARCHAR(32) NOT NULL DEFAULT 'UNVERIFIED',
+ PRIMARY KEY (course_id,semester_definition_id),
+ FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+ FOREIGN KEY (semester_definition_id) REFERENCES semester_definitions(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS data_verification_issues (
+ id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+ issue_key CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE,
+ curriculum_plan_id BIGINT UNSIGNED NULL, course_id BIGINT UNSIGNED NULL,
+ issue_type VARCHAR(64) NOT NULL, severity ENUM('INFO','WARNING','ERROR') NOT NULL,
+ description TEXT NOT NULL, status ENUM('OPEN','RESOLVED') NOT NULL DEFAULT 'OPEN',
+ created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, resolved_at TIMESTAMP NULL,
+ FOREIGN KEY (curriculum_plan_id) REFERENCES curriculum_plans(id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+ FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS seed_runs (
+ source_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY,
+ source_reference VARCHAR(255) NOT NULL,
+ completed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;

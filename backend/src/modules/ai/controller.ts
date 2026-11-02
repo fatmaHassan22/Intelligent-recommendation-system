@@ -1,0 +1,21 @@
+import {Router} from 'express';
+import {z} from 'zod';
+import type {Pool} from 'mysql2/promise';
+import type {Config} from '../../config.js';
+import {id,code} from '../../validation.js';
+import {rows,write,transaction} from '../../db.js';
+import {ApiError} from '../../errors.js';
+import {isoDate,sqlDate} from '../productivity/time.js';
+import {ownedConversation,conversationMessages,sendChat,usage} from './service.js';
+import type {StudyProvider} from './provider.js';
+const title=z.string().trim().min(1).max(120);
+export const chatSchema=z.object({conversation_id:id,request_id:z.uuid(),content:z.string().trim().min(1).max(4000),mode:z.enum(['STUDY','ACADEMIC']).default('STUDY'),course_code:code.nullable().default(null),include_academic_context:z.boolean().default(false),include_moodle_context:z.boolean().default(false),allow_external_context:z.boolean().default(false)}).strict();
+export function aiRoutes(pool:Pool,c:Config,clock=()=>new Date(),provider?:StudyProvider){const r=Router();
+ r.get('/usage',async(req,res)=>res.json({data:await usage(pool,c,req.actor!.id,clock(),provider?.configured)}));
+ r.get('/conversations',async(req,res)=>res.json({data:(await rows(pool,'SELECT id,title,created_at,updated_at FROM ai_conversations WHERE user_id=? ORDER BY updated_at DESC,id DESC LIMIT 50',[req.actor!.id])).map(x=>({...x,created_at:isoDate(x.created_at),updated_at:isoDate(x.updated_at)}))}));
+ r.post('/conversations',async(req,res)=>{const b=z.object({title:title.default('محادثة دراسية جديدة')}).strict().parse(req.body??{});const saved=await transaction(pool,async db=>{await rows(db,'SELECT user_id FROM student_profiles WHERE user_id=? FOR UPDATE',[req.actor!.id]);if(Number((await rows(db,'SELECT COUNT(*) AS n FROM ai_conversations WHERE user_id=?',[req.actor!.id]))[0].n)>=50)throw new ApiError(409,'AI_CONVERSATION_LIMIT');const result=await write(db,'INSERT INTO ai_conversations(user_id,title,created_at,updated_at) VALUES(?,?,?,?)',[req.actor!.id,b.title,sqlDate(clock()),sqlDate(clock())]);return ownedConversation(db,req.actor!.id,String(result.insertId));});res.status(201).json({data:saved});});
+ r.get('/conversations/:conversationId',async(req,res)=>{const conversation=await ownedConversation(pool,req.actor!.id,id.parse(req.params.conversationId));res.json({data:{id:String(conversation.id),title:conversation.title,messages:await conversationMessages(pool,req.actor!.id,String(conversation.id),clock())}});});
+ r.patch('/conversations/:conversationId',async(req,res)=>{const b=z.object({title}).strict().parse(req.body);await ownedConversation(pool,req.actor!.id,id.parse(req.params.conversationId));await write(pool,'UPDATE ai_conversations SET title=?,updated_at=? WHERE id=? AND user_id=?',[b.title,sqlDate(clock()),req.params.conversationId,req.actor!.id]);res.status(204).end();});
+ r.delete('/conversations/:conversationId',async(req,res)=>{if(Object.keys(req.body??{}).length)throw new ApiError(400,'VALIDATION_ERROR');await transaction(pool,async db=>{const conversation=await ownedConversation(db,req.actor!.id,id.parse(req.params.conversationId),true);const active=await rows(db,"SELECT id FROM ai_chat_requests WHERE conversation_id=? AND user_id=? AND status='RUNNING' AND lease_until>?",[conversation.id,req.actor!.id,sqlDate(clock())]);if(active.length)throw new ApiError(409,'AI_REQUEST_BUSY');await write(db,'DELETE FROM ai_conversations WHERE id=? AND user_id=?',[conversation.id,req.actor!.id]);});res.status(204).end();});
+ r.post('/chat',async(req,res)=>res.json({data:await sendChat(pool,c,req.actor!.id,chatSchema.parse(req.body),clock(),provider)}));return r;
+}
