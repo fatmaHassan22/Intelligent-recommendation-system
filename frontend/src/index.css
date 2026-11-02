@@ -59,3 +59,113 @@
     transition-delay: 0ms !important;
   }
 }
+
+
+
+
+/* ---------- حركات إضافية ---------- */
+@theme {
+  --animate-drift: drift 14s ease-in-out infinite alternate;
+  --animate-drift-rev: drift 18s ease-in-out infinite alternate-reverse;
+  --animate-sway: sway 6s ease-in-out infinite;
+  --animate-ripple: ripple 3.6s ease-out infinite;
+  --animate-step-in: stepIn 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-step-back: stepBack 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-shake: shake 0.45s;
+  --animate-ring-pulse: ringPulse 2s ease-out infinite;
+
+  @keyframes drift {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(-40px, 50px) scale(1.15); }
+  }
+  @keyframes sway {
+    0%, 100% { transform: rotate(-12deg); }
+    50% { transform: rotate(14deg); }
+  }
+  @keyframes ripple {
+    0% { opacity: 0.5; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.7); }
+  }
+  @keyframes stepIn {
+    from { opacity: 0; transform: translateX(-28px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes stepBack {
+    from { opacity: 0; transform: translateX(28px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes shake {
+    0%, 100% { transform: none; }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+  }
+  @keyframes ringPulse {
+    0% { box-shadow: 0 0 0 4px #fff, 0 0 0 4px rgba(11, 122, 110, 0.5); }
+    100% { box-shadow: 0 0 0 4px #fff, 0 0 0 16px rgba(11, 122, 110, 0); }
+  }
+}
+
+@keyframes sweep { to { inset-inline-start: 140%; } }
+@keyframes spinBtn { to { transform: rotate(360deg); } }
+
+/* ---------- ظهور متتابع لعناصر النموذج ---------- */
+.auth-stagger > * { animation: var(--animate-rise); }
+.auth-stagger > :nth-child(1) { animation-delay: 0.05s; }
+.auth-stagger > :nth-child(2) { animation-delay: 0.12s; }
+.auth-stagger > :nth-child(3) { animation-delay: 0.19s; }
+.auth-stagger > :nth-child(4) { animation-delay: 0.26s; }
+.auth-stagger > :nth-child(5) { animation-delay: 0.33s; }
+.auth-stagger > :nth-child(n + 6) { animation-delay: 0.4s; }
+
+/* ---------- الحقول (تعمل مع Input و Select الحاليين دون تعديلهما) ----------
+   مكتوبة خارج @layer عمدًا، لتتغلب على قواعد styles.css القديمة. */
+.auth-fields.auth-fields label {
+  @apply mt-[18px] block text-sm font-semibold transition-colors focus-within:text-accent;
+}
+.auth-fields.auth-fields :is(input, select, textarea) {
+  @apply mt-2 h-[52px] w-full rounded-[14px] border-[1.5px] border-line bg-white px-4 font-normal text-ink outline-none transition duration-200 hover:border-[#bfd0de] focus:border-accent focus:bg-[#fbfffe] focus:ring-4 focus:ring-accent/15 disabled:cursor-not-allowed disabled:opacity-60;
+}
+.auth-fields.auth-fields :is(input, select):user-invalid {
+  border-color: #d9534f;
+  box-shadow: 0 0 0 4px rgba(217, 83, 79, 0.12);
+}
+
+/* ---------- الأزرار ---------- */
+.auth-fields.auth-fields button[type="submit"],
+.auth-fields.auth-fields button[type="button"] {
+  @apply relative mt-6 inline-flex min-h-[52px] cursor-pointer items-center justify-center gap-2.5 overflow-hidden rounded-[14px] border-0 px-7 font-semibold transition duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
+}
+.auth-fields.auth-fields button[type="submit"] {
+  @apply bg-linear-to-br from-accent to-[#096459] text-white hover:-translate-y-0.5 hover:shadow-[0_14px_26px_-10px_rgba(11,122,110,0.6)];
+}
+.auth-fields.auth-fields button[type="button"] {
+  @apply bg-white text-ink shadow-[inset_0_0_0_1.5px_var(--color-line)] hover:shadow-[inset_0_0_0_1.5px_var(--color-accent)];
+}
+/* بريق يعبر زر الإرسال */
+.auth-fields.auth-fields button[type="submit"]::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: -80%;
+  width: 55%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+.auth-fields.auth-fields button[type="submit"]:hover::before { animation: sweep 0.8s ease; }
+.auth-fields.auth-fields button[type="submit"] svg { transition: transform 0.3s; }
+.auth-fields.auth-fields button[type="submit"]:hover svg:last-child { transform: translateX(-4px); }
+
+/* دوّار التحميل: أضيفي aria-busy={busy} على <button> داخل Button في components/ui */
+.auth-fields.auth-fields button[aria-busy="true"] { pointer-events: none; }
+.auth-fields.auth-fields button[aria-busy="true"]::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  animation: spinBtn 0.7s linear infinite;
+}
