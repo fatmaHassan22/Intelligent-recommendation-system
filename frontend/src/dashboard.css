@@ -1,0 +1,39 @@
+.student-dashboard { min-width: 0; }
+.dashboard-hero { position: relative; overflow: hidden; gap: 24px; }
+.dashboard-hero-copy h1 { margin: 10px 0 5px; color: #fff; font-size: clamp(22px, 2.4vw, 30px); line-height: 1.45; font-weight: 800; }
+.dashboard-greeting { color: #e0ece9; font-size: 14px; font-weight: 650; }
+.dashboard-action-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 18px; align-items: stretch; }
+.dashboard-next-step { margin: 0; min-width: 0; }
+.dashboard-shortcuts { grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; align-content: start; }
+.dashboard-shortcut { min-width: 0; }
+.dashboard-shortcut strong, .dashboard-shortcut small { overflow-wrap: anywhere; }
+.dashboard-shortcut small { color: #4A5A73; font-size: 12px; }
+.dashboard-section-intro p, .dashboard-subheading, .dashboard-progress-foot, .dashboard-caveat, .dashboard-progress-unknown { color: #4A5A73; }
+.dashboard-shortcut > svg { color: #4A5A73; }
+@media (max-width: 800px) {
+  .dashboard-action-grid { grid-template-columns: minmax(0, 1fr); }
+  .dashboard-shortcuts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dashboard-hero { gap: 12px; padding: 24px 20px; }
+  .dashboard-hero .banner-art { flex: 0 0 96px; width: 96px; margin-inline-start: 0; }
+}
+@media (max-width: 420px) {
+  .dashboard-hero { padding: 20px 16px; min-height: 0; }
+  .dashboard-hero-copy { min-width: 0; }
+  .dashboard-hero-copy h1 { font-size: 21px; overflow-wrap: anywhere; }
+  .dashboard-hero-actions { align-items: stretch; gap: 8px; }
+  .dashboard-hero-actions > * { max-width: 100%; white-space: normal; }
+  .dashboard-hero .banner-art { flex-basis: 64px; width: 64px; height: 76px; }
+  .dashboard-hero .banner-art > svg { width: 44px; height: 44px; }
+  .dashboard-section-intro { align-items: flex-start; flex-wrap: wrap; }
+  .dashboard-section-intro > a { padding-top: 0; font-size: 12px; }
+  .dashboard-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .student-dashboard .stat { min-width: 0; padding: 14px 10px; }
+  .student-dashboard .stat p { min-width: 0; padding-inline-start: 0; font-size: 12px; overflow-wrap: anywhere; }
+  .student-dashboard .stat small { font-size: 12px; overflow-wrap: anywhere; }
+  .student-dashboard .stat strong { font-size: 25px; }
+  .dashboard-shortcuts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .dashboard-shortcut { min-height: 100px; padding: 10px; }
+  .dashboard-shortcut strong, .dashboard-shortcut small { font-size: 12px; }
+  .dashboard-empty-progress { align-items: flex-start; }
+  .dashboard-empty-progress > div { min-width: 0; }
+}

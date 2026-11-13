@@ -78,7 +78,7 @@ export function Welcome() {
 //             <div>
 //                 <span className="eyebrow">رحلتك الأكاديمية، بوضوح</span>
 //                 <h2>كل خطوة صغيرة<br />تصنع فرقًا.</h2>
-//                 <p>ابدئي بخطتك الحالية، احتفظي بإنجازك، وتابعي تقدمك بثقة ووعي بالبيانات المتاحة.</p>
+//                 <p>ابدأ بخطتك الحالية، احتفظ بإنجازك، وتابع تقدمك بثقة ووعي بالبيانات المتاحة.</p>
 //                 <div className="auth-emblem">
 //                     <Compass size={85} />
 //                 </div>
@@ -126,7 +126,7 @@ function AuthFrame({ title, subtitle, children }: { title: string; subtitle: str
                 </h2>
 
                 <p className="mb-5 max-w-[420px] animate-rise leading-loose text-white/75 [animation-delay:.5s] max-lg:hidden">
-                    ابدئي بخطتك الحالية، احتفظي بإنجازك، وتابعي تقدمك بثقة ووعي بالبيانات المتاحة.
+                    ابدأ بخطتك الحالية، احتفظ بإنجازك، وتابع تقدمك بثقة ووعي بالبيانات المتاحة.
                 </p>
 
                 <ul className="mb-7 grid gap-3 max-lg:hidden">
@@ -216,7 +216,7 @@ export function Login() {
 
             </form>
 
-            <p className="auth-switch">ليس لديكِ حساب؟
+            <p className="auth-switch">ليس لديك حساب؟
                 <Link to="/register">إنشاء حساب جديد</Link>
             </p>
         </AuthFrame>
@@ -243,19 +243,19 @@ const initial: Registration =
 
 export function validateStep(step: number, data: Registration): string | null {
     if (step === 0) {
-        if (!data.full_name.trim()) return 'أدخلي اسمك الكامل.';
-        if (!/^[\x21-\x7e]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) return 'أدخلي بريدًا إلكترونيًا صالحًا.';
+        if (!data.full_name.trim()) return 'أدخل اسمك الكامل.';
+        if (!/^[\x21-\x7e]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) return 'أدخل بريدًا إلكترونيًا صالحًا.';
         if (data.password.length < 12 || new TextEncoder().encode(data.password).length > 72) return 'كلمة المرور يجب أن تكون 12 حرفًا على الأقل وألا تتجاوز 72 بايت.';
     }
     if (step === 1 &&
         (!data.major_id || !data.curriculum_plan_id))
-        return 'اختاري تخصصًا وخطة من القائمة.';
+        return 'اختر تخصصًا وخطة من القائمة.';
 
     if (step === 2 &&
         (!Number.isInteger(data.max_semester_credit_hours) ||
             data.max_semester_credit_hours <= 0 ||
             data.max_semester_credit_hours > 65535))
-        return 'أدخلي عدد ساعات صحيحًا موجبًا.';
+        return 'أدخل عدد ساعات صحيحًا موجبًا.';
     return null;
 }
 
@@ -358,7 +358,7 @@ export function validateStep(step: number, data: Registration): string | null {
 //                         onChange={e => setData(d => ({ ...d, major_id: e.target.value, curriculum_plan_id: '' }))}>
 
 //                         <option value="">
-//                             {majors.isPending ? 'جارٍ تحميل التخصصات…' : 'اختاري تخصصك'}
+//                             {majors.isPending ? 'جارٍ تحميل التخصصات…' : 'اختر تخصصك'}
 //                         </option>
 
 //                         {majors.data?.map(m => <option key={m.id}
@@ -371,7 +371,7 @@ export function validateStep(step: number, data: Registration): string | null {
 //                     required disabled={!data.major_id || plans.isPending}
 //                     value={data.curriculum_plan_id}
 //                     onChange={e => set('curriculum_plan_id', e.target.value)}>
-//                     <option value="">اختاري الخطة</option>
+//                     <option value="">اختر الخطة</option>
 //                     {plans.data?.map(p => <option key={p.id}
 //                         value={String(p.id)}>الخطة {p.plan_number}
 //                     </option>)}
@@ -431,7 +431,7 @@ export function validateStep(step: number, data: Registration): string | null {
 //                     <dd>{data.career_interest ?? 'غير محدد'}</dd>
 //                 </div>
 //             </dl>
-//                 <p className="helper">راجعي بياناتك. يمكنك تعديل ملفك لاحقًا، مع تأكيد عند تغيير الخطة.</p>
+//                 <p className="helper">راجع بياناتك. يمكنك تعديل ملفك لاحقًا، مع تأكيد عند تغيير الخطة.</p>
 //             </>}{(error || register.error) &&
 //                 <p className="form-error" role="alert">{error ?? errorMessage(register.error)}</p>
 //             }
@@ -456,7 +456,7 @@ export function validateStep(step: number, data: Registration): string | null {
                 
 //             </div>
 //         </form>
-//         <p className="auth-switch">لديكِ حساب؟
+//         <p className="auth-switch">لديك حساب؟
 //             <Link to="/login">تسجيل الدخول</Link>
 //         </p>
 //     </AuthFrame>;
@@ -568,8 +568,8 @@ export function Register() {
 
     const message = error ?? (register.error ? errorMessage(register.error) : null);
 
-    return <AuthFrame title="ابدئي مسارك"
-        subtitle="أربع خطوات قصيرة، وحساب يتبع خطتك أنتِ.">
+    return <AuthFrame title="ابدأ مسارك"
+        subtitle="أربع خطوات قصيرة، وحساب يتبع خطتك أنت.">
         <Stepper steps={titles} current={step} />
 
         <form onSubmit={submit}>
@@ -607,7 +607,7 @@ export function Register() {
                             disabled={majors.isPending}
                             onChange={e => setData(d => ({ ...d, major_id: e.target.value, curriculum_plan_id: '' }))}>
                             <option value="">
-                                {majors.isPending ? 'جارٍ تحميل التخصصات…' : 'اختاري تخصصك'}
+                                {majors.isPending ? 'جارٍ تحميل التخصصات…' : 'اختر تخصصك'}
                             </option>
                             {majors.data?.map(m => <option key={m.id} value={String(m.id)}>{m.name_ar}</option>)}
                         </Select>}
@@ -615,7 +615,7 @@ export function Register() {
                         required disabled={!data.major_id || plans.isPending}
                         value={data.curriculum_plan_id}
                         onChange={e => set('curriculum_plan_id', e.target.value)}>
-                        <option value="">اختاري الخطة</option>
+                        <option value="">اختر الخطة</option>
                         {plans.data?.map(p => <option key={p.id} value={String(p.id)}>الخطة {p.plan_number}</option>)}
                     </Select>
                     {plans.error && <ErrorState error={plans.error} retry={() => void plans.refetch()} />}
@@ -658,7 +658,7 @@ export function Register() {
                             </div>
                         ))}
                     </dl>
-                    <p className="mt-3 text-xs leading-relaxed text-muted">راجعي بياناتك. يمكنك تعديل ملفك لاحقًا، مع تأكيد عند تغيير الخطة.</p>
+                    <p className="mt-3 text-xs leading-relaxed text-muted">راجع بياناتك. يمكنك تعديل ملفك لاحقًا، مع تأكيد عند تغيير الخطة.</p>
                 </>}
             </div>
 
@@ -679,6 +679,6 @@ export function Register() {
             </div>
         </form>
 
-        <SwitchLink text="لديكِ حساب؟" to="/login" label="تسجيل الدخول" />
+        <SwitchLink text="لديك حساب؟" to="/login" label="تسجيل الدخول" />
     </AuthFrame>;
 }

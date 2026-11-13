@@ -79,7 +79,7 @@ export function CalendarScreen() {
             <div className="mb-2 text-center text-xs font-semibold text-muted">{d}</div>
             <div className="flex flex-col gap-1.5">
               {calendar.events[i].map(([t, k]) => (
-                <div key={t} className={`rounded-lg px-1.5 py-2 text-center text-[11px] font-semibold leading-tight ${eventStyle[k]}`}>{t}</div>
+                <div key={t} className={`rounded-lg px-1.5 py-2 text-center text-xs font-semibold leading-tight ${eventStyle[k]}`}>{t}</div>
               ))}
             </div>
           </div>

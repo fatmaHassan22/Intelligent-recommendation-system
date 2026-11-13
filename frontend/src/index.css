@@ -8,7 +8,7 @@
   --color-accent-mint: #5EEAD4;
   --color-line: #DDE4EF;
   --color-surface: #F5F7FB;
-  --font-sans: "IBM Plex Sans Arabic", "Noto Sans Arabic Variable", Tahoma, sans-serif;
+  --font-sans: "Cairo", sans-serif;
 
   --animate-float: float 6s ease-in-out infinite;
   --animate-float-slow: float 9s ease-in-out infinite reverse;
@@ -128,7 +128,7 @@
   @apply mt-2 h-[52px] w-full rounded-[14px] border-[1.5px] border-line bg-white px-4 font-normal text-ink outline-none transition duration-200 hover:border-[#bfd0de] focus:border-accent focus:bg-[#fbfffe] focus:ring-4 focus:ring-accent/15 disabled:cursor-not-allowed disabled:opacity-60;
 }
 .auth-fields.auth-fields :is(input, select):user-invalid {
-  border-color: #d9534f;
+  border-color:#c04946;
   box-shadow: 0 0 0 4px rgba(217, 83, 79, 0.12);
 }
 

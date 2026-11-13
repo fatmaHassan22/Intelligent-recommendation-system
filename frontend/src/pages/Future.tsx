@@ -2,7 +2,7 @@ import {Link,useLocation} from 'react-router-dom';
 import {ArrowRight,Construction,Compass} from 'lucide-react';
 import {navigation} from '../components/Layout';
 import {Badge,PageHeader} from '../components/ui';
-const descriptions:Record<string,string>={recommendations:'توصيات المساقات تحتاج محركًا يعتمد على بيانات أكاديمية مكتملة. هذه المرحلة تعرض خطتك وإنجازك فقط.',planner:'سيتيح المخطط تنظيم اختياراتك الدراسية بعد تطوير الخدمات اللازمة واعتماد قواعد الجامعة.',tasks:'ستتمكنين من تنظيم مهامك ومتابعة إنجازها عند إتاحة هذه الميزة.',calendar:'التقويم يحتاج مصادر مواعيد فعلية وخدمة لحفظ أحداثك، وهي غير متاحة بعد.',pomodoro:'مؤقت الدراسة وتتبع جلساتها جزء من مرحلة الأدوات الإنتاجية القادمة.',notifications:'لا توجد خدمة إشعارات أو رسائل محفوظة حاليًا.',assistant:'المساعد الدراسي يحتاج خدمات ذكاء اصطناعي معتمدة، ولم تُبنَ في هذه المرحلة.'};
+const descriptions:Record<string,string>={recommendations:'توصيات المساقات تحتاج محركًا يعتمد على بيانات أكاديمية مكتملة. هذه المرحلة تعرض خطتك وإنجازك فقط.',planner:'سيتيح المخطط تنظيم اختياراتك الدراسية بعد تطوير الخدمات اللازمة واعتماد قواعد الجامعة.',tasks:'ستتمكن من تنظيم مهامك ومتابعة إنجازها عند إتاحة هذه الميزة.',calendar:'التقويم يحتاج مصادر مواعيد فعلية وخدمة لحفظ أحداثك، وهي غير متاحة بعد.',pomodoro:'مؤقت الدراسة وتتبع جلساتها جزء من مرحلة الأدوات الإنتاجية القادمة.',notifications:'لا توجد خدمة إشعارات أو رسائل محفوظة حاليًا.',assistant:'المساعد الدراسي يحتاج خدمات ذكاء اصطناعي معتمدة، ولم تُبنَ في هذه المرحلة.'};
 export function FuturePage(){
     const slug=useLocation().pathname.split('/').at(-1)??'',
     item=navigation.find(n=>n.path===slug),

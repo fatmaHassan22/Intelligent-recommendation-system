@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@fontsource-variable/noto-sans-arabic':
-        specifier: ^5.2.0
-        version: 5.3.0
       '@fontsource/cairo':
         specifier: 5.3.0
         version: 5.3.0
@@ -371,9 +368,6 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
-
-  '@fontsource-variable/noto-sans-arabic@5.3.0':
-    resolution: {integrity: sha512-Rz8+DBzza3//cmN+DBQajJhx3x+Dx12eUgnQsTOgPWbOT0+In6APmE8z4I/QQnUWfAx+s8l93+60qDT5vJH1sA==}
 
   '@fontsource/cairo@5.3.0':
     resolution: {integrity: sha512-MdY6+gee1DVz4eUvx1Dd8Y1f50WcRELRKwKBarYZA3zT8dMhkuTWbcoE1LzezAy97h/9rob87s02NI6L8MaDgA==}
@@ -1852,8 +1846,6 @@ snapshots:
     optional: true
 
   '@exodus/bytes@1.16.0': {}
-
-  '@fontsource-variable/noto-sans-arabic@5.3.0': {}
 
   '@fontsource/cairo@5.3.0': {}
 

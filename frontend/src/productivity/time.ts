@@ -5,7 +5,7 @@ export function addDays(day:string,n:number){return new Date(Date.parse(day+'T12
 export function monthShift(day:string,n:number){const d=new Date(day+'T12:00:00Z');return new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+n,1,12)).toISOString().slice(0,10);}
 export function localToIso(input:string,zone:string){const wall=Date.parse(input.length===16?input+':00Z':input+'Z');if(!Number.isFinite(wall))throw new Error('تاريخ غير صالح');let guess=wall;
  for(let i=0;i<4;i++){const p=dateParts(new Date(guess),zone),delta=wall-Date.parse(`${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:${p.second}Z`);if(!delta)break;guess+=delta;}
- const p=dateParts(new Date(guess),zone),normalized=`${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;if(normalized!==input.slice(0,16))throw new Error('هذا الوقت المحلي غير موجود بسبب تغيير التوقيت؛ اختاري وقتًا آخر.');return new Date(guess).toISOString();
+ const p=dateParts(new Date(guess),zone),normalized=`${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;if(normalized!==input.slice(0,16))throw new Error('هذا الوقت المحلي غير موجود بسبب تغيير التوقيت؛ اختر وقتًا آخر.');return new Date(guess).toISOString();
 }
 export function localDayStart(day:string,zone:string){for(let hour=0;hour<4;hour++){try{return localToIso(`${day}T${String(hour).padStart(2,'0')}:00`,zone);}catch{/* DST may skip local midnight. */}}throw new Error('تعذر تحديد بداية اليوم');}
 export function localInput(iso:string,timezone:string){const p=dateParts(new Date(iso),timezone);return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;}

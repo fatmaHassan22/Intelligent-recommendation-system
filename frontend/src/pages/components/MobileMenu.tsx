@@ -7,7 +7,7 @@ export default function MobileMenu({ open, links, cta, onNavigate }: Props) {
   return (
     <div id="mobileNav" onClick={(e) => (e.target as HTMLElement).closest("a") && onNavigate()}
       className={`grid transition-[grid-template-rows] duration-300 lg:hidden ${open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
-      <div className="overflow-hidden" {...(open ? {} : { inert: "" })}>
+      <div className="overflow-hidden" inert={!open}>
         <nav className="flex flex-col px-6 pb-5" aria-label="قائمة الجوال">
           {links.map((l) => (
             <a key={l.href} href={l.href} className="flex min-h-[48px] items-center border-t border-line font-medium">{l.label}</a>

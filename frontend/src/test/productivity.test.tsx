@@ -16,7 +16,7 @@ const task:Task={id:'42',title:'تحضير مراجعة',description:'وصف',pr
 let tasks:Task[],active:ActiveResponse,notifications:Notification[];
 let get:MockInstance<typeof api.get>,mutate:MockInstance<typeof api.mutate>;
 beforeEach(()=>{
- tasks=[{...task}];active={data:null,server_now:new Date().toISOString(),suggested_break_mode:'SHORT_BREAK'};notifications=[{id:'7',type:'TASK_UPCOMING',title:'اقترب الموعد',message:'راجعي المهمة.',read_at:null,created_at:'2026-10-11T08:00:00.000Z',href:'/app/tasks/42',task_id:'42',event_id:null,session_id:null}];
+ tasks=[{...task}];active={data:null,server_now:new Date().toISOString(),suggested_break_mode:'SHORT_BREAK'};notifications=[{id:'7',type:'TASK_UPCOMING',title:'اقترب الموعد',message:'راجع المهمة.',read_at:null,created_at:'2026-10-11T08:00:00.000Z',href:'/app/tasks/42',task_id:'42',event_id:null,session_id:null}];
  get=vi.spyOn(api,'get').mockImplementation(async(path:string)=>{
   if(path.endsWith('/notifications/preferences'))return {data:{timezone:'UTC',configured:true,task_upcoming:true,task_overdue:true,event_reminders:true,pomodoro_completion:true,general_reminders:true,task_reminder_minutes:60,event_reminder_minutes:30}} as any;
   if(path.endsWith('/productivity/courses'))return {data:[]} as any;
