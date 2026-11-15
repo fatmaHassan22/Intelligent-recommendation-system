@@ -1,54 +1,1082 @@
-import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { ArrowLeft, ArrowRight, BookOpen, CheckCircle2, CheckCheck, Clock3, GraduationCap, Layers3, Search, Trash2, Plus, Compass, CalendarDays, Info, ShieldCheck } from 'lucide-react';
-import { api, errorMessage } from '../api/client';
-import type { Course, CourseDetail, CoursePage, ElectiveGroup, List, PrerequisiteEvaluation, Result } from '../api/types';
-import { useAuth } from '../state';
-import { useCompleted, useMajors, usePlans, useProfile, useProgress, useRefreshAcademic } from '../hooks';
-import { Badge, Button, Confirm, Empty, ErrorState, Input, Notice, PageHeader, Select, Skeleton, Stat, number, roleLabel, useToast } from '../components/ui';
-import { EngagementDashboard } from '../engagement/Engagement';
-import { ProductivityDashboard } from '../productivity/Tasks';
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  CheckCircle2,
+  CheckCheck,
+  Clock3,
+  GraduationCap,
+  Layers3,
+  Search,
+  Trash2,
+  Plus,
+  Compass,
+  CalendarDays,
+  Info,
+  ShieldCheck,
+} from "lucide-react";
+import { api, errorMessage } from "../api/client";
+import type {
+  Course,
+  CourseDetail,
+  CoursePage,
+  ElectiveGroup,
+  List,
+  PrerequisiteEvaluation,
+  Result,
+} from "../api/types";
+import { useAuth } from "../state";
+import {
+  useCompleted,
+  useMajors,
+  usePlans,
+  useProfile,
+  useProgress,
+  useRefreshAcademic,
+} from "../hooks";
+import {
+  Badge,
+  Button,
+  Confirm,
+  Empty,
+  ErrorState,
+  Input,
+  Notice,
+  PageHeader,
+  Select,
+  Skeleton,
+  Stat,
+  number,
+  roleLabel,
+  useToast,
+} from "../components/ui";
+import { EngagementDashboard } from "../engagement/Engagement";
+import { ProductivityDashboard } from "../productivity/Tasks";
 
-
-function Completeness() { return <Notice><strong>صورة واضحة، ضمن البيانات المتاحة</strong><p>هذه الأرقام تخص المساقات المسجلة في خطتك الحالية. بعض متطلبات الدرجة لم تُستكمل، لذا لا نعرض نسبة تخرج أو أهلية تخرج رسمية.</p></Notice>; }
-function GroupCard({ group }: { group: ElectiveGroup }) { const completed = group.known_credit_hours, target = group.required_credit_hours; return <article className="elective-card"><div><span className="section-kicker">مجموعة اختياري</span><h3>{group.name_ar ?? 'مجموعة الاختياري'}</h3></div><div className="elective-numbers"><strong>{number(completed)} <small>/ {number(target)}</small></strong><span>ساعة معروفة / مطلوبة من المجموعة</span></div>{typeof target === 'number' && target > 0 && typeof completed === 'number' && <progress value={Math.min(completed, target)} max={target} aria-label="الساعات المنجزة من مجموعة الاختياري" />}<p>المطلوب هو هدف المجموعة، وليس اجتياز جميع الخيارات.</p></article>; }
-export function Dashboard() {
-    const auth = useAuth(), profile = useProfile(), progress = useProgress(), completed = useCompleted(), majors = useMajors(), plans = usePlans(String(profile.data?.major_id ?? ''));
-    if (profile.isPending || progress.isPending || completed.isPending) return <Skeleton />; if (profile.error || progress.error || completed.error || majors.error || plans.error) return <ErrorState error={profile.error ?? progress.error ?? completed.error ?? majors.error ?? plans.error} retry={() => { void profile.refetch(); void progress.refetch(); void completed.refetch(); void majors.refetch(); void plans.refetch(); }} />;
-    const p = progress.data!, current = profile.data!, major = majors.data?.find(m => String(m.id) === String(current.major_id)), plan = plans.data?.find(p => String(p.id) === String(current.curriculum_plan_id));
-    const recent = [...(completed.data ?? [])].sort((a, b) => (b.created_at ?? '').localeCompare(a.created_at ?? '')).slice(0, 3);
-    return <><PageHeader eyebrow="مساحتك الأكاديمية" title={`أهلًا، ${auth.user?.full_name.split(' ')[0] ?? ''}`} description="كل إنجاز يقرّبك من فهم رحلتك. إليكِ صورة اليوم." action={<Link className="btn btn-secondary" to="/app/profile">ملفي الأكاديمي<ArrowLeft size={16} /></Link>} /><section className="welcome-banner"><div><Badge tone="teal">خطتك الحالية</Badge><h2>{major?.name_ar ?? 'جارٍ تحميل التخصص'}</h2><p>الخطة {plan ? number(plan.plan_number) : '…'} <span>·</span> إجمالي ساعات الخطة: {number(plan?.total_credit_hours)}</p><Link to="/app/curriculum">استكشفي مساقاتك<ArrowLeft size={17} /></Link></div><div className="banner-art" aria-hidden="true"><div className="art-orbit" /><GraduationCap size={75} /><span><BookOpen size={19} /></span></div></section><div className="stats-grid"><Stat label="ساعات منجزة معروفة" value={number(p.known_completed_credit_hours)} hint={p.completed_credit_summary.unknown_credit_course_count ? `${number(p.completed_credit_summary.unknown_credit_course_count)} مساق بساعات غير معروفة` : 'من المساقات التي أعلنتِ اجتيازها'} icon={<GraduationCap size={23} />} /><Stat label="مساقات منجزة" value={number(p.completed_course_count)} hint="إقرار شخصي، غير موثّق جامعيًا" icon={<CheckCheck size={23} />} /><Stat label="مساقات غير منجزة" value={number(p.remaining_course_count)} hint="تشمل الخيارات الاختيارية المتاحة" icon={<BookOpen size={23} />} /><Stat label="مساقات الخطة المتاحة" value={number(p.total_known_curriculum_courses)} hint="بحسب العضويات المسجلة حاليًا" icon={<Layers3 size={23} />} /></div><div className="dashboard-columns"><section className="surface"><div className="section-heading"><div><span className="section-kicker">خطوة بخطوة</span><h2>آخر إنجازاتك</h2></div><Link to="/app/completed">عرض الكل<ArrowLeft size={15} /></Link></div>{recent.length ? recent.map(c => <Link className="recent-course" key={c.course_code} to={`/app/curriculum/${c.course_code}`}><span className="course-mini-icon"><CheckCircle2 size={22} /></span><div><h3>{c.name_ar}</h3><small><bdi>{c.course_code}</bdi> · {number(c.credit_hours)} ساعة</small></div><ArrowLeft size={17} /></Link>) : <Empty title="بداية جديدة، ومساحة لإنجازك" description="أضيفي أول مساق اجتزتِه لتبدئي متابعة تقدمك." action={<Link className="btn btn-secondary" to="/app/completed">إضافة مساق منجز<Plus size={16} /></Link>} />}</section><section className="surface"><div className="section-heading"><div><span className="section-kicker">اختيارك التالي</span><h2>اختصارات مفيدة</h2></div><Compass size={22} /></div><Link className="quick-action" to="/app/curriculum"><BookOpen /><div><strong>افهمي خطتك</strong><small>ابحثي في المساقات ومتطلباتها</small></div><ArrowLeft size={17} /></Link><Link className="quick-action" to="/app/completed"><CheckCheck /><div><strong>حدّثي إنجازك</strong><small>احتفظي بسجل المساقات المجتازة</small></div><ArrowLeft size={17} /></Link><Link className="quick-action" to="/app/progress"><Layers3 /><div><strong>راجعي تقدمك</strong><small>ساعات معروفة وأهداف الاختياري</small></div><ArrowLeft size={17} /></Link></section></div><EngagementDashboard /><ProductivityDashboard /><Completeness /></>;
+function Completeness() {
+  return (
+    <Notice>
+      <strong>صورة واضحة، ضمن البيانات المتاحة</strong>
+      <p>
+        هذه الأرقام تخص المساقات المسجلة في خطتك الحالية. بعض متطلبات الدرجة لم
+        تُستكمل، لذا لا نعرض نسبة تخرج أو أهلية تخرج رسمية.
+      </p>
+    </Notice>
+  );
 }
-function CourseCard({ course, completed }: { course: Course; completed: boolean | null }) { return <article className="course-card"><div className="course-card-top"><span className="course-symbol"><BookOpen size={19} /></span><Badge tone={course.requirement_type === 'UNVERIFIED' ? 'amber' : course.requirement_type === 'ELECTIVE' ? 'teal' : 'blue'}>{roleLabel(course.requirement_type)}</Badge></div><bdi className="course-code">{course.course_code}</bdi><h3>{course.source_name_ar ?? course.name_ar}</h3><div className="course-meta"><span>{number(course.credit_hours)} ساعة</span><span>المستوى {number(course.level)}</span></div><footer>{completed === null ? <span className="muted">جارٍ التحقق من الإنجاز</span> : completed ? <span className="completed-label"><CheckCircle2 size={16} /> منجز بإقرارك</span> : <span className="muted">لم يُعلن إنجازه</span>}<Link to={`/app/curriculum/${course.course_code}`} aria-label={`تفاصيل ${course.name_ar}`}>التفاصيل<ArrowLeft size={15} /></Link></footer></article>; }
+function GroupCard({ group }: { group: ElectiveGroup }) {
+  const completed = group.known_credit_hours,
+    target = group.required_credit_hours;
+  return (
+    <article className="elective-card">
+      <div>
+        <span className="section-kicker">مجموعة اختياري</span>
+        <h3>{group.name_ar ?? "مجموعة الاختياري"}</h3>
+      </div>
+      <div className="elective-numbers">
+        <strong>
+          {number(completed)} <small>/ {number(target)}</small>
+        </strong>
+        <span>ساعة معروفة / مطلوبة من المجموعة</span>
+      </div>
+      {typeof target === "number" &&
+        target > 0 &&
+        typeof completed === "number" && (
+          <progress
+            value={Math.min(completed, target)}
+            max={target}
+            aria-label="الساعات المنجزة من مجموعة الاختياري"
+          />
+        )}
+      <p>المطلوب هو هدف المجموعة، وليس اجتياز جميع الخيارات.</p>
+    </article>
+  );
+}
+export function Dashboard() {
+  const auth = useAuth(),
+    profile = useProfile(),
+    progress = useProgress(),
+    completed = useCompleted(),
+    majors = useMajors(),
+    plans = usePlans(String(profile.data?.major_id ?? ""));
+  if (profile.isPending || progress.isPending || completed.isPending)
+    return <Skeleton />;
+  if (
+    profile.error ||
+    progress.error ||
+    completed.error ||
+    majors.error ||
+    plans.error
+  )
+    return (
+      <ErrorState
+        error={
+          profile.error ??
+          progress.error ??
+          completed.error ??
+          majors.error ??
+          plans.error
+        }
+        retry={() => {
+          void profile.refetch();
+          void progress.refetch();
+          void completed.refetch();
+          void majors.refetch();
+          void plans.refetch();
+        }}
+      />
+    );
+  const p = progress.data!,
+    current = profile.data!,
+    major = majors.data?.find((m) => String(m.id) === String(current.major_id)),
+    plan = plans.data?.find(
+      (p) => String(p.id) === String(current.curriculum_plan_id),
+    );
+  const recent = [...(completed.data ?? [])]
+    .sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""))
+    .slice(0, 3);
+  return (
+    <>
+      <PageHeader
+        eyebrow="مساحتك الأكاديمية"
+        title={`أهلًا، ${auth.user?.full_name.split(" ")[0] ?? ""}`}
+        description="كل إنجاز يقرّبك من فهم رحلتك. إليكِ صورة اليوم."
+        action={
+          <Link className="btn btn-secondary" to="/app/profile">
+            ملفي الأكاديمي
+            <ArrowLeft size={16} />
+          </Link>
+        }
+      />
+      <section className="welcome-banner">
+        <div>
+          <Badge tone="teal">خطتك الحالية</Badge>
+          <h2>{major?.name_ar ?? "جارٍ تحميل التخصص"}</h2>
+          <p>
+            الخطة {plan ? number(plan.plan_number) : "…"} <span>·</span> إجمالي
+            ساعات الخطة: {number(plan?.total_credit_hours)}
+          </p>
+          <Link to="/app/curriculum">
+            استكشفي مساقاتك
+            <ArrowLeft size={17} />
+          </Link>
+        </div>
+        <div className="banner-art" aria-hidden="true">
+          <div className="art-orbit" />
+          <GraduationCap size={75} />
+          <span>
+            <BookOpen size={19} />
+          </span>
+        </div>
+      </section>
+      <div className="stats-grid">
+        <Stat
+          label="ساعات منجزة معروفة"
+          value={number(p.known_completed_credit_hours)}
+          hint={
+            p.completed_credit_summary.unknown_credit_course_count
+              ? `${number(p.completed_credit_summary.unknown_credit_course_count)} مساق بساعات غير معروفة`
+              : "من المساقات التي أعلنتِ اجتيازها"
+          }
+          icon={<GraduationCap size={23} />}
+        />
+        <Stat
+          label="مساقات منجزة"
+          value={number(p.completed_course_count)}
+          hint="إقرار شخصي، غير موثّق جامعيًا"
+          icon={<CheckCheck size={23} />}
+        />
+        <Stat
+          label="مساقات غير منجزة"
+          value={number(p.remaining_course_count)}
+          hint="تشمل الخيارات الاختيارية المتاحة"
+          icon={<BookOpen size={23} />}
+        />
+        <Stat
+          label="مساقات الخطة المتاحة"
+          value={number(p.total_known_curriculum_courses)}
+          hint="بحسب العضويات المسجلة حاليًا"
+          icon={<Layers3 size={23} />}
+        />
+      </div>
+      <div className="dashboard-columns">
+        <section className="surface">
+          <div className="section-heading">
+            <div>
+              <span className="section-kicker">خطوة بخطوة</span>
+              <h2>آخر إنجازاتك</h2>
+            </div>
+            <Link to="/app/completed">
+              عرض الكل
+              <ArrowLeft size={15} />
+            </Link>
+          </div>
+          {recent.length ? (
+            recent.map((c) => (
+              <Link
+                className="recent-course"
+                key={c.course_code}
+                to={`/app/curriculum/${c.course_code}`}
+              >
+                <span className="course-mini-icon">
+                  <CheckCircle2 size={22} />
+                </span>
+                <div>
+                  <h3>{c.name_ar}</h3>
+                  <small>
+                    <bdi>{c.course_code}</bdi> · {number(c.credit_hours)} ساعة
+                  </small>
+                </div>
+                <ArrowLeft size={17} />
+              </Link>
+            ))
+          ) : (
+            <Empty
+              title="بداية جديدة، ومساحة لإنجازك"
+              description="أضيفي أول مساق اجتزتِه لتبدئي متابعة تقدمك."
+              action={
+                <Link className="btn btn-secondary" to="/app/completed">
+                  إضافة مساق منجز
+                  <Plus size={16} />
+                </Link>
+              }
+            />
+          )}
+        </section>
+        <section className="surface">
+          <div className="section-heading">
+            <div>
+              <span className="section-kicker">اختيارك التالي</span>
+              <h2>اختصارات مفيدة</h2>
+            </div>
+            <Compass size={22} />
+          </div>
+          <Link className="quick-action" to="/app/curriculum">
+            <BookOpen />
+            <div>
+              <strong>افهمي خطتك</strong>
+              <small>ابحثي في المساقات ومتطلباتها</small>
+            </div>
+            <ArrowLeft size={17} />
+          </Link>
+          <Link className="quick-action" to="/app/completed">
+            <CheckCheck />
+            <div>
+              <strong>حدّثي إنجازك</strong>
+              <small>احتفظي بسجل المساقات المجتازة</small>
+            </div>
+            <ArrowLeft size={17} />
+          </Link>
+          <Link className="quick-action" to="/app/progress">
+            <Layers3 />
+            <div>
+              <strong>راجعي تقدمك</strong>
+              <small>ساعات معروفة وأهداف الاختياري</small>
+            </div>
+            <ArrowLeft size={17} />
+          </Link>
+        </section>
+      </div>
+      <EngagementDashboard />
+      <ProductivityDashboard />
+      <Completeness />
+    </>
+  );
+}
+function CourseCard({
+  course,
+  completed,
+}: {
+  course: Course;
+  completed: boolean | null;
+}) {
+  return (
+    <article className="course-card">
+      <div className="course-card-top">
+        <span className="course-symbol">
+          <BookOpen size={19} />
+        </span>
+        <Badge
+          tone={
+            course.requirement_type === "UNVERIFIED"
+              ? "amber"
+              : course.requirement_type === "ELECTIVE"
+                ? "teal"
+                : "blue"
+          }
+        >
+          {roleLabel(course.requirement_type)}
+        </Badge>
+      </div>
+      <bdi className="course-code">{course.course_code}</bdi>
+      <h3>{course.source_name_ar ?? course.name_ar}</h3>
+      <div className="course-meta">
+        <span>{number(course.credit_hours)} ساعة</span>
+        <span>المستوى {number(course.level)}</span>
+      </div>
+      <footer>
+        {completed === null ? (
+          <span className="muted">جارٍ التحقق من الإنجاز</span>
+        ) : completed ? (
+          <span className="completed-label">
+            <CheckCircle2 size={16} /> منجز بإقرارك
+          </span>
+        ) : (
+          <span className="muted">لم يُعلن إنجازه</span>
+        )}
+        <Link
+          to={`/app/curriculum/${course.course_code}`}
+          aria-label={`تفاصيل ${course.name_ar}`}
+        >
+          التفاصيل
+          <ArrowLeft size={15} />
+        </Link>
+      </footer>
+    </article>
+  );
+}
 export function Curriculum() {
-    const profile = useProfile(), completed = useCompleted(); const [search, setSearch] = useState(''), [debounced, setDebounced] = useState(''), [level, setLevel] = useState(''), [requirement, setRequirement] = useState(''), [page, setPage] = useState(1);
-    useEffect(() => { const timer = setTimeout(() => { setDebounced(search); setPage(1); }, 300); return () => clearTimeout(timer); }, [search]);
-    const query = new URLSearchParams({ page: String(page), limit: '12', ...(debounced ? { search: debounced } : {}), ...(level ? { level } : {}), ...(requirement ? { requirement_type: requirement } : {}) });
-    const courses = useQuery({ queryKey: ['catalog', 'courses', profile.data?.curriculum_plan_id, page, debounced, level, requirement], queryFn: () => api.get<CoursePage>(`/plans/${profile.data!.curriculum_plan_id}/courses?${query}`), enabled: !!profile.data });
-    const groups = useQuery({ queryKey: ['catalog', 'electives', profile.data?.curriculum_plan_id], queryFn: () => api.get<List<ElectiveGroup>>(`/plans/${profile.data!.curriculum_plan_id}/elective-groups`).then(r => r.data), enabled: !!profile.data });
-    const codes = new Set(completed.data?.map(c => c.course_code));
-    return <><PageHeader eyebrow="مساقات ومتطلبات" title="خطتي الدراسية" description="استكشفي مساقات خطتك الحالية، وافهمي ما تعرفه البيانات وما لم يُتحقق منه بعد." /><div className="filters surface"><Input label="البحث عن مساق" placeholder="اسم المساق أو رمزه…" maxLength={100} value={search} onChange={e => setSearch(e.target.value)} /><Input label="المستوى الأكاديمي" type="number" min={1} max={65535} placeholder="كل المستويات" value={level} onChange={e => { if (!e.target.value || /^[1-9][0-9]{0,4}$/.test(e.target.value) && Number(e.target.value) <= 65535) { setLevel(e.target.value); setPage(1); } }} /><Select label="نوع المتطلب" value={requirement} onChange={e => { setRequirement(e.target.value); setPage(1); }}><option value="">كل التصنيفات</option><option value="REQUIRED">إجباري</option><option value="ELECTIVE">اختياري</option><option value="UNVERIFIED">غير متحقق</option></Select></div>{profile.error ? <ErrorState error={profile.error} retry={() => void profile.refetch()} /> : courses.error ? <ErrorState error={courses.error} retry={() => void courses.refetch()} /> : courses.isPending ? <Skeleton /> : <><div className="results-heading"><span>{number(courses.data.pagination.total)} مساق مطابق</span><small>إنجاز المساق يعتمد على إقرارك الشخصي</small></div>{courses.data.data.length ? <div className="course-grid">{courses.data.data.map(c => <CourseCard key={c.course_code} course={c} completed={completed.isPending || completed.error ? null : codes.has(c.course_code)} />)}</div> : <Empty title="لا توجد مساقات مطابقة" description="جرّبي اسمًا آخر أو أزيلي بعض المرشحات." />}<div className="pagination"><Button variant="secondary" disabled={page === 1 || courses.isFetching} onClick={() => setPage(page - 1)}><ArrowRight size={16} /> السابق</Button><span>صفحة {number(page)} من {number(Math.max(1, Math.ceil(courses.data.pagination.total / 12)))}</span><Button variant="secondary" disabled={page * 12 >= courses.data.pagination.total || courses.isFetching} onClick={() => setPage(page + 1)}>التالي<ArrowLeft size={16} /></Button></div></>}{completed.error && <ErrorState error={completed.error} retry={() => void completed.refetch()} />}<section className="surface elective-summary"><div className="section-heading"><h2>مجموعات الاختياري</h2><Badge>خيارات، وليست جميعها إلزامية</Badge></div>{groups.error ? <ErrorState error={groups.error} retry={() => void groups.refetch()} /> : groups.isPending ? <Skeleton /> : groups.data?.length ? groups.data.map(g => <div className="elective-line" key={g.id}><div><strong>{g.name_ar}</strong><p>{number(g.courses?.length)} مساق متاح في هذه المجموعة</p></div><Badge tone="teal">المطلوب: {number(g.required_credit_hours)} ساعة</Badge></div>) : <p className="muted">لم تُسجل متطلبات الاختياري لهذه الخطة بعد.</p>}</section></>;
+  const profile = useProfile(),
+    completed = useCompleted();
+  const [search, setSearch] = useState(""),
+    [debounced, setDebounced] = useState(""),
+    [level, setLevel] = useState(""),
+    [requirement, setRequirement] = useState(""),
+    [page, setPage] = useState(1);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebounced(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+  const query = new URLSearchParams({
+    page: String(page),
+    limit: "12",
+    ...(debounced ? { search: debounced } : {}),
+    ...(level ? { level } : {}),
+    ...(requirement ? { requirement_type: requirement } : {}),
+  });
+  const courses = useQuery({
+    queryKey: [
+      "catalog",
+      "courses",
+      profile.data?.curriculum_plan_id,
+      page,
+      debounced,
+      level,
+      requirement,
+    ],
+    queryFn: () =>
+      api.get<CoursePage>(
+        `/plans/${profile.data!.curriculum_plan_id}/courses?${query}`,
+      ),
+    enabled: !!profile.data,
+  });
+  const groups = useQuery({
+    queryKey: ["catalog", "electives", profile.data?.curriculum_plan_id],
+    queryFn: () =>
+      api
+        .get<
+          List<ElectiveGroup>
+        >(`/plans/${profile.data!.curriculum_plan_id}/elective-groups`)
+        .then((r) => r.data),
+    enabled: !!profile.data,
+  });
+  const codes = new Set(completed.data?.map((c) => c.course_code));
+  return (
+    <>
+      <PageHeader
+        eyebrow="مساقات ومتطلبات"
+        title="خطتي الدراسية"
+        description="استكشفي مساقات خطتك الحالية، وافهمي ما تعرفه البيانات وما لم يُتحقق منه بعد."
+      />
+      <div className="filters surface">
+        <Input
+          label="البحث عن مساق"
+          placeholder="اسم المساق أو رمزه…"
+          maxLength={100}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <Input
+          label="المستوى الأكاديمي"
+          type="number"
+          min={1}
+          max={65535}
+          placeholder="كل المستويات"
+          value={level}
+          onChange={(e) => {
+            if (
+              !e.target.value ||
+              (/^[1-9][0-9]{0,4}$/.test(e.target.value) &&
+                Number(e.target.value) <= 65535)
+            ) {
+              setLevel(e.target.value);
+              setPage(1);
+            }
+          }}
+        />
+        <Select
+          label="نوع المتطلب"
+          value={requirement}
+          onChange={(e) => {
+            setRequirement(e.target.value);
+            setPage(1);
+          }}
+        >
+          <option value="">كل التصنيفات</option>
+          <option value="REQUIRED">إجباري</option>
+          <option value="ELECTIVE">اختياري</option>
+          <option value="UNVERIFIED">غير متحقق</option>
+        </Select>
+      </div>
+      {profile.error ? (
+        <ErrorState
+          error={profile.error}
+          retry={() => void profile.refetch()}
+        />
+      ) : courses.error ? (
+        <ErrorState
+          error={courses.error}
+          retry={() => void courses.refetch()}
+        />
+      ) : courses.isPending ? (
+        <Skeleton />
+      ) : (
+        <>
+          <div className="results-heading">
+            <span>{number(courses.data.pagination.total)} مساق مطابق</span>
+            <small>إنجاز المساق يعتمد على إقرارك الشخصي</small>
+          </div>
+          {courses.data.data.length ? (
+            <div className="course-grid">
+              {courses.data.data.map((c) => (
+                <CourseCard
+                  key={c.course_code}
+                  course={c}
+                  completed={
+                    completed.isPending || completed.error
+                      ? null
+                      : codes.has(c.course_code)
+                  }
+                />
+              ))}
+            </div>
+          ) : (
+            <Empty
+              title="لا توجد مساقات مطابقة"
+              description="جرّبي اسمًا آخر أو أزيلي بعض المرشحات."
+            />
+          )}
+          <div className="pagination">
+            <Button
+              variant="secondary"
+              disabled={page === 1 || courses.isFetching}
+              onClick={() => setPage(page - 1)}
+            >
+              <ArrowRight size={16} /> السابق
+            </Button>
+            <span>
+              صفحة {number(page)} من{" "}
+              {number(
+                Math.max(1, Math.ceil(courses.data.pagination.total / 12)),
+              )}
+            </span>
+            <Button
+              variant="secondary"
+              disabled={
+                page * 12 >= courses.data.pagination.total || courses.isFetching
+              }
+              onClick={() => setPage(page + 1)}
+            >
+              التالي
+              <ArrowLeft size={16} />
+            </Button>
+          </div>
+        </>
+      )}
+      {completed.error && (
+        <ErrorState
+          error={completed.error}
+          retry={() => void completed.refetch()}
+        />
+      )}
+      <section className="surface elective-summary">
+        <div className="section-heading">
+          <h2>مجموعات الاختياري</h2>
+          <Badge>خيارات، وليست جميعها إلزامية</Badge>
+        </div>
+        {groups.error ? (
+          <ErrorState
+            error={groups.error}
+            retry={() => void groups.refetch()}
+          />
+        ) : groups.isPending ? (
+          <Skeleton />
+        ) : groups.data?.length ? (
+          groups.data.map((g) => (
+            <div className="elective-line" key={g.id}>
+              <div>
+                <strong>{g.name_ar}</strong>
+                <p>{number(g.courses?.length)} مساق متاح في هذه المجموعة</p>
+              </div>
+              <Badge tone="teal">
+                المطلوب: {number(g.required_credit_hours)} ساعة
+              </Badge>
+            </div>
+          ))
+        ) : (
+          <p className="muted">لم تُسجل متطلبات الاختياري لهذه الخطة بعد.</p>
+        )}
+      </section>
+    </>
+  );
 }
 export function CourseDetails() {
-    const { courseCode = '' } = useParams(), profile = useProfile(), toast = useToast(), refresh = useRefreshAcademic(), completed = useCompleted();
-    const course = useQuery({ queryKey: ['catalog', 'detail', profile.data?.curriculum_plan_id, courseCode], queryFn: () => api.get<Result<CourseDetail>>(`/plans/${profile.data!.curriculum_plan_id}/courses/${encodeURIComponent(courseCode)}`).then(r => r.data), enabled: !!profile.data });
-    const evaluation = useQuery({ queryKey: ['student', 'prerequisite', profile.data?.curriculum_plan_id, courseCode], queryFn: () => api.get<Result<PrerequisiteEvaluation>>(`/students/me/courses/${encodeURIComponent(courseCode)}/prerequisites`).then(r => r.data), enabled: !!profile.data });
-    const add = useMutation({ mutationFn: () => api.mutate('/students/me/completed-courses', 'POST', { course_code: courseCode }), onSuccess: async () => { await refresh(); toast('سُجل المساق كمنجز بإقرارك.'); }, onError: e => toast(errorMessage(e), 'error') });
-    if (profile.error || course.error) return <ErrorState error={profile.error ?? course.error} retry={() => { void profile.refetch(); void course.refetch(); }} />; if (course.isPending) return <Skeleton />;
-    const c = course.data, isCompleted = completed.data?.some(x => x.course_code === courseCode), e = evaluation.data;
-    return <><Link className="back-link" to="/app/curriculum"><ArrowRight size={16} /> العودة للخطة</Link><PageHeader eyebrow={c.course_code} title={c.source_name_ar ?? c.name_ar} description="تفاصيل المساق في خطتك الحالية، لا في جميع الخطط." action={<Badge tone={c.requirement_type === 'UNVERIFIED' ? 'amber' : 'teal'}>{roleLabel(c.requirement_type)}</Badge>} /><div className="detail-overview surface"><div><small>الساعات</small><strong>{number(c.credit_hours)}</strong></div><div><small>المستوى</small><strong>{number(c.level)}</strong></div><div><small>الإنجاز</small><strong>{completed.isPending ? 'جارٍ التحقق' : isCompleted ? 'منجز بإقرارك' : 'غير منجز'}</strong></div><Button busy={add.isPending} disabled={isCompleted || completed.isPending || !!completed.error} onClick={() => add.mutate()}>{isCompleted ? <CheckCheck size={18} /> : <Plus size={18} />} {isCompleted ? 'تم تسجيل الإنجاز' : 'أعلنتُ اجتياز هذا المساق'}</Button></div>{completed.error && <ErrorState error={completed.error} retry={() => void completed.refetch()} />}<section className="surface"><div className="section-heading"><h2>المتطلبات السابقة</h2><Badge tone={e?.is_unverified ? 'amber' : e?.satisfied ? 'teal' : 'neutral'}>{!e ? 'جارٍ التحقق' : e.is_unverified ? 'المعلومات غير متحققة' : e.satisfied ? 'مستوفاة حسب إقرارك' : 'متطلبات غير مستوفاة'}</Badge></div><p className="helper">كل البنود التالية مطلوبة معًا (و). داخل كل بند يكفي اجتياز بديل واحد (أو)، وفق تقييم الخادم.</p>{evaluation.error ? <ErrorState error={evaluation.error} retry={() => void evaluation.refetch()} /> : evaluation.isPending ? <Skeleton /> : e?.is_unverified ? <Notice>لا تتوفر معلومات متحققة كافية عن المتطلبات السابقة. لا يعني ذلك عدم وجود متطلب.</Notice> : e?.groups.length === 0 ? <Empty title="لا يوجد متطلب سابق مسجل" description="وردت هذه الحالة صراحة في بيانات الخطة الحالية." /> : <div className="prerequisite-groups">{e?.groups.map((g, i) => <div key={g.group_number}><article className={`prerequisite-group ${g.satisfied ? 'satisfied' : ''}`}><header><strong>البند {number(i + 1)}</strong><Badge tone={g.satisfied ? 'teal' : 'amber'}>{g.satisfied ? 'مستوفى' : 'غير مستوفى'}</Badge></header><div className="prerequisite-alternatives">{g.courses.map((code, index) => <div key={code}>{index > 0 && <span className="operator">أو</span>}<span className="prerequisite-code"><bdi>{code}</bdi><small>{g.completed_alternatives?.includes(code) ? 'أعلنتِ اجتيازه' : 'لم يُعلن اجتيازه'}</small></span></div>)}</div></article>{i < e.groups.length - 1 && <div className="and-connector">و · يجب استيفاء البند التالي أيضًا</div>}</div>)}</div>}<p className="helper">هذا عرض للمتطلبات ضمن البيانات المتاحة، وليس قرار أهلية للتسجيل.</p></section><div className="dashboard-columns"><section className="surface"><div className="section-heading"><h2>الفصول المعتادة</h2><CalendarDays size={20} /></div>{c.typical_semesters.records.length ? c.typical_semesters.records.map(s => <div className="semester-record" key={s.code}><Badge tone="blue">{s.name_ar}</Badge><small>{s.verification_status === 'LEGACY_DATA' ? 'بيانات قديمة تحتاج تحققًا' : 'بحسب المصدر المسجل'}</small></div>) : <p className="muted">الفصل المعتاد لهذا المساق غير معروف.</p>}<p className="helper">تكرار طرح المساق عادةً لا يؤكد طرحه في فصل بعينه.</p></section><section className="surface"><div className="section-heading"><h2>الطرح الفعلي</h2><Info size={20} /></div>{c.live_offerings.records.length ? c.live_offerings.records.map((o, i) => <p key={i}>{o.academic_year} · {o.semester} · {o.is_offered ? 'مطروح' : 'غير مطروح'}</p>) : <p className="muted">لا توجد بيانات مؤكدة عن الطرح الفعلي.</p>}</section></div></>;
+  const { courseCode = "" } = useParams(),
+    profile = useProfile(),
+    toast = useToast(),
+    refresh = useRefreshAcademic(),
+    completed = useCompleted();
+  const course = useQuery({
+    queryKey: [
+      "catalog",
+      "detail",
+      profile.data?.curriculum_plan_id,
+      courseCode,
+    ],
+    queryFn: () =>
+      api
+        .get<
+          Result<CourseDetail>
+        >(`/plans/${profile.data!.curriculum_plan_id}/courses/${encodeURIComponent(courseCode)}`)
+        .then((r) => r.data),
+    enabled: !!profile.data,
+  });
+  const evaluation = useQuery({
+    queryKey: [
+      "student",
+      "prerequisite",
+      profile.data?.curriculum_plan_id,
+      courseCode,
+    ],
+    queryFn: () =>
+      api
+        .get<
+          Result<PrerequisiteEvaluation>
+        >(`/students/me/courses/${encodeURIComponent(courseCode)}/prerequisites`)
+        .then((r) => r.data),
+    enabled: !!profile.data,
+  });
+  const add = useMutation({
+    mutationFn: () =>
+      api.mutate("/students/me/completed-courses", "POST", {
+        course_code: courseCode,
+      }),
+    onSuccess: async () => {
+      await refresh();
+      toast("سُجل المساق كمنجز بإقرارك.");
+    },
+    onError: (e) => toast(errorMessage(e), "error"),
+  });
+  if (profile.error || course.error)
+    return (
+      <ErrorState
+        error={profile.error ?? course.error}
+        retry={() => {
+          void profile.refetch();
+          void course.refetch();
+        }}
+      />
+    );
+  if (course.isPending) return <Skeleton />;
+  const c = course.data,
+    isCompleted = completed.data?.some((x) => x.course_code === courseCode),
+    e = evaluation.data;
+  return (
+    <>
+      <Link className="back-link" to="/app/curriculum">
+        <ArrowRight size={16} /> العودة للخطة
+      </Link>
+      <PageHeader
+        eyebrow={c.course_code}
+        title={c.source_name_ar ?? c.name_ar}
+        description="تفاصيل المساق في خطتك الحالية، لا في جميع الخطط."
+        action={
+          <Badge tone={c.requirement_type === "UNVERIFIED" ? "amber" : "teal"}>
+            {roleLabel(c.requirement_type)}
+          </Badge>
+        }
+      />
+      <div className="detail-overview surface">
+        <div>
+          <small>الساعات</small>
+          <strong>{number(c.credit_hours)}</strong>
+        </div>
+        <div>
+          <small>المستوى</small>
+          <strong>{number(c.level)}</strong>
+        </div>
+        <div>
+          <small>الإنجاز</small>
+          <strong>
+            {completed.isPending
+              ? "جارٍ التحقق"
+              : isCompleted
+                ? "منجز بإقرارك"
+                : "غير منجز"}
+          </strong>
+        </div>
+        <Button
+          busy={add.isPending}
+          disabled={isCompleted || completed.isPending || !!completed.error}
+          onClick={() => add.mutate()}
+        >
+          {isCompleted ? <CheckCheck size={18} /> : <Plus size={18} />}{" "}
+          {isCompleted ? "تم تسجيل الإنجاز" : "أعلنتُ اجتياز هذا المساق"}
+        </Button>
+      </div>
+      {completed.error && (
+        <ErrorState
+          error={completed.error}
+          retry={() => void completed.refetch()}
+        />
+      )}
+      <section className="surface">
+        <div className="section-heading">
+          <h2>المتطلبات السابقة</h2>
+          <Badge
+            tone={
+              e?.is_unverified ? "amber" : e?.satisfied ? "teal" : "neutral"
+            }
+          >
+            {!e
+              ? "جارٍ التحقق"
+              : e.is_unverified
+                ? "المعلومات غير متحققة"
+                : e.satisfied
+                  ? "مستوفاة حسب إقرارك"
+                  : "متطلبات غير مستوفاة"}
+          </Badge>
+        </div>
+        <p className="helper">
+          كل البنود التالية مطلوبة معًا (و). داخل كل بند يكفي اجتياز بديل واحد
+          (أو)، وفق تقييم الخادم.
+        </p>
+        {evaluation.error ? (
+          <ErrorState
+            error={evaluation.error}
+            retry={() => void evaluation.refetch()}
+          />
+        ) : evaluation.isPending ? (
+          <Skeleton />
+        ) : e?.is_unverified ? (
+          <Notice>
+            لا تتوفر معلومات متحققة كافية عن المتطلبات السابقة. لا يعني ذلك عدم
+            وجود متطلب.
+          </Notice>
+        ) : e?.groups.length === 0 ? (
+          <Empty
+            title="لا يوجد متطلب سابق مسجل"
+            description="وردت هذه الحالة صراحة في بيانات الخطة الحالية."
+          />
+        ) : (
+          <div className="prerequisite-groups">
+            {e?.groups.map((g, i) => (
+              <div key={g.group_number}>
+                <article
+                  className={`prerequisite-group ${g.satisfied ? "satisfied" : ""}`}
+                >
+                  <header>
+                    <strong>البند {number(i + 1)}</strong>
+                    <Badge tone={g.satisfied ? "teal" : "amber"}>
+                      {g.satisfied ? "مستوفى" : "غير مستوفى"}
+                    </Badge>
+                  </header>
+                  <div className="prerequisite-alternatives">
+                    {g.courses.map((code, index) => (
+                      <div key={code}>
+                        {index > 0 && <span className="operator">أو</span>}
+                        <span className="prerequisite-code">
+                          <bdi>{code}</bdi>
+                          <small>
+                            {g.completed_alternatives?.includes(code)
+                              ? "أعلنتِ اجتيازه"
+                              : "لم يُعلن اجتيازه"}
+                          </small>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+                {i < e.groups.length - 1 && (
+                  <div className="and-connector">
+                    و · يجب استيفاء البند التالي أيضًا
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="helper">
+          هذا عرض للمتطلبات ضمن البيانات المتاحة، وليس قرار أهلية للتسجيل.
+        </p>
+      </section>
+      <div className="dashboard-columns">
+        <section className="surface">
+          <div className="section-heading">
+            <h2>الفصول المعتادة</h2>
+            <CalendarDays size={20} />
+          </div>
+          {c.typical_semesters.records.length ? (
+            c.typical_semesters.records.map((s) => (
+              <div className="semester-record" key={s.code}>
+                <Badge tone="blue">{s.name_ar}</Badge>
+                <small>
+                  {s.verification_status === "LEGACY_DATA"
+                    ? "بيانات قديمة تحتاج تحققًا"
+                    : "بحسب المصدر المسجل"}
+                </small>
+              </div>
+            ))
+          ) : (
+            <p className="muted">الفصل المعتاد لهذا المساق غير معروف.</p>
+          )}
+          <p className="helper">
+            تكرار طرح المساق عادةً لا يؤكد طرحه في فصل بعينه.
+          </p>
+        </section>
+        <section className="surface">
+          <div className="section-heading">
+            <h2>الطرح الفعلي</h2>
+            <Info size={20} />
+          </div>
+          {c.live_offerings.records.length ? (
+            c.live_offerings.records.map((o, i) => (
+              <p key={i}>
+                {o.academic_year} · {o.semester} ·{" "}
+                {o.is_offered ? "مطروح" : "غير مطروح"}
+              </p>
+            ))
+          ) : (
+            <p className="muted">لا توجد بيانات مؤكدة عن الطرح الفعلي.</p>
+          )}
+        </section>
+      </div>
+    </>
+  );
 }
 export function Completed() {
-    const courses = useCompleted(), profile = useProfile(), refresh = useRefreshAcademic(), toast = useToast(); const [search, setSearch] = useState(''), [debounced, setDebounced] = useState(''), [page, setPage] = useState(1), [confirm, setConfirm] = useState<Course | null>(null);
-    useEffect(() => { const timer = setTimeout(() => { setDebounced(search); setPage(1); }, 300); return () => clearTimeout(timer); }, [search]);
-    const available = useQuery({ queryKey: ['catalog', 'completion-search', profile.data?.curriculum_plan_id, debounced, page], queryFn: () => api.get<CoursePage>(`/plans/${profile.data!.curriculum_plan_id}/courses?${new URLSearchParams({ search: debounced, page: String(page), limit: '5' })}`), enabled: !!profile.data });
-    const add = useMutation({ mutationFn: (code: string) => api.mutate('/students/me/completed-courses', 'POST', { course_code: code }), onSuccess: async () => { await refresh(); toast('تم تسجيل المساق كمنجز.'); }, onError: e => toast(errorMessage(e), 'error') });
-    const remove = useMutation({ mutationFn: (code: string) => api.mutate(`/students/me/completed-courses/${encodeURIComponent(code)}`, 'DELETE'), onSuccess: async () => { await refresh(); setConfirm(null); toast('تمت إزالة إعلان الإنجاز.'); }, onError: e => toast(errorMessage(e), 'error') });
-    const done = new Set(courses.data?.map(c => c.course_code));
-    return <><PageHeader eyebrow="سجلك الشخصي" title="المواد المنجزة" description="سجّلي المساقات التي اجتزتِها. هذا إقرار منك، وليس سجل علامات معتمدًا من الجامعة." /><div className="dashboard-columns completed-columns"><section className="surface"><div className="section-heading"><h2>مساقاتك المنجزة</h2><Badge tone="teal">{number(courses.data?.length)} مساق</Badge></div>{courses.error ? <ErrorState error={courses.error} retry={() => void courses.refetch()} /> : courses.isPending ? <Skeleton /> : courses.data.length ? courses.data.map(c => <div className="completion-row" key={c.course_code}><span className="course-mini-icon"><CheckCheck size={20} /></span><div><Link to={`/app/curriculum/${c.course_code}`}>{c.name_ar}</Link><small><bdi>{c.course_code}</bdi> · {number(c.credit_hours)} ساعة</small></div><button className="icon-btn remove-btn" aria-label={`إزالة إنجاز ${c.course_code}`} onClick={() => setConfirm(c)}><Trash2 size={18} /></button></div>) : <Empty title="لم تسجّلي إنجازًا بعد" description="ابحثي في المساقات المتاحة وأضيفي ما اجتزتِه بالفعل." />}</section><section className="surface"><div className="section-heading"><h2>إضافة مساق منجز</h2><Plus size={20} /></div><Input label="ابحثي في خطتك" placeholder="اسم المساق أو رمزه" maxLength={100} value={search} onChange={e => setSearch(e.target.value)} />{profile.error ? <ErrorState error={profile.error} retry={() => void profile.refetch()} /> : available.error ? <ErrorState error={available.error} retry={() => void available.refetch()} /> : available.isPending ? <Skeleton /> : available.data.data.length ? <>{available.data.data.map(c => <div className="add-course-row" key={c.course_code}><div><strong>{c.source_name_ar ?? c.name_ar}</strong><small><bdi>{c.course_code}</bdi> · {number(c.credit_hours)} ساعة</small></div><Button variant="secondary" disabled={done.has(c.course_code) || add.isPending || courses.isPending || !!courses.error} busy={add.isPending && add.variables === c.course_code} onClick={() => add.mutate(c.course_code)}>{done.has(c.course_code) ? 'منجز' : 'إضافة'}</Button></div>)}<div className="pagination small-pagination"><Button variant="ghost" disabled={page === 1} onClick={() => setPage(page - 1)}>السابق</Button><small>صفحة {number(page)}</small><Button variant="ghost" disabled={page * 5 >= available.data.pagination.total} onClick={() => setPage(page + 1)}>التالي</Button></div></> : <Empty title="لا توجد نتائج" description="جرّبي اسمًا أو رمزًا آخر." />}<p className="helper">لا تُضاف المتطلبات السابقة تلقائيًا عند إعلان إنجاز مساق.</p></section></div>{confirm && <Confirm title="إزالة إعلان الإنجاز؟" description={`سيُزال ${confirm.name_ar} من إنجازات خطتك الحالية فقط. لن يُحذف المساق من الخطة أو الدليل.`} busy={remove.isPending} onClose={() => setConfirm(null)} onConfirm={() => remove.mutate(confirm.course_code)} />}</>;
+  const courses = useCompleted(),
+    profile = useProfile(),
+    refresh = useRefreshAcademic(),
+    toast = useToast();
+  const [search, setSearch] = useState(""),
+    [debounced, setDebounced] = useState(""),
+    [page, setPage] = useState(1),
+    [confirm, setConfirm] = useState<Course | null>(null);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebounced(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+  const available = useQuery({
+    queryKey: [
+      "catalog",
+      "completion-search",
+      profile.data?.curriculum_plan_id,
+      debounced,
+      page,
+    ],
+    queryFn: () =>
+      api.get<CoursePage>(
+        `/plans/${profile.data!.curriculum_plan_id}/courses?${new URLSearchParams({ search: debounced, page: String(page), limit: "5" })}`,
+      ),
+    enabled: !!profile.data,
+  });
+  const add = useMutation({
+    mutationFn: (code: string) =>
+      api.mutate("/students/me/completed-courses", "POST", {
+        course_code: code,
+      }),
+    onSuccess: async () => {
+      await refresh();
+      toast("تم تسجيل المساق كمنجز.");
+    },
+    onError: (e) => toast(errorMessage(e), "error"),
+  });
+  const remove = useMutation({
+    mutationFn: (code: string) =>
+      api.mutate(
+        `/students/me/completed-courses/${encodeURIComponent(code)}`,
+        "DELETE",
+      ),
+    onSuccess: async () => {
+      await refresh();
+      setConfirm(null);
+      toast("تمت إزالة إعلان الإنجاز.");
+    },
+    onError: (e) => toast(errorMessage(e), "error"),
+  });
+  const done = new Set(courses.data?.map((c) => c.course_code));
+  return (
+    <>
+      <PageHeader
+        eyebrow="سجلك الشخصي"
+        title="المواد المنجزة"
+        description="سجّلي المساقات التي اجتزتِها. هذا إقرار منك، وليس سجل علامات معتمدًا من الجامعة."
+      />
+      <div className="dashboard-columns completed-columns">
+        <section className="surface">
+          <div className="section-heading">
+            <h2>مساقاتك المنجزة</h2>
+            <Badge tone="teal">{number(courses.data?.length)} مساق</Badge>
+          </div>
+          {courses.error ? (
+            <ErrorState
+              error={courses.error}
+              retry={() => void courses.refetch()}
+            />
+          ) : courses.isPending ? (
+            <Skeleton />
+          ) : courses.data.length ? (
+            courses.data.map((c) => (
+              <div className="completion-row" key={c.course_code}>
+                <span className="course-mini-icon">
+                  <CheckCheck size={20} />
+                </span>
+                <div>
+                  <Link to={`/app/curriculum/${c.course_code}`}>
+                    {c.name_ar}
+                  </Link>
+                  <small>
+                    <bdi>{c.course_code}</bdi> · {number(c.credit_hours)} ساعة
+                  </small>
+                </div>
+                <button
+                  className="icon-btn remove-btn"
+                  aria-label={`إزالة إنجاز ${c.course_code}`}
+                  onClick={() => setConfirm(c)}
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            ))
+          ) : (
+            <Empty
+              title="لم تسجّلي إنجازًا بعد"
+              description="ابحثي في المساقات المتاحة وأضيفي ما اجتزتِه بالفعل."
+            />
+          )}
+        </section>
+        <section className="surface">
+          <div className="section-heading">
+            <h2>إضافة مساق منجز</h2>
+            <Plus size={20} />
+          </div>
+          <Input
+            label="ابحثي في خطتك"
+            placeholder="اسم المساق أو رمزه"
+            maxLength={100}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          {profile.error ? (
+            <ErrorState
+              error={profile.error}
+              retry={() => void profile.refetch()}
+            />
+          ) : available.error ? (
+            <ErrorState
+              error={available.error}
+              retry={() => void available.refetch()}
+            />
+          ) : available.isPending ? (
+            <Skeleton />
+          ) : available.data.data.length ? (
+            <>
+              {available.data.data.map((c) => (
+                <div className="add-course-row" key={c.course_code}>
+                  <div>
+                    <strong>{c.source_name_ar ?? c.name_ar}</strong>
+                    <small>
+                      <bdi>{c.course_code}</bdi> · {number(c.credit_hours)} ساعة
+                    </small>
+                  </div>
+                  <Button
+                    variant="secondary"
+                    disabled={
+                      done.has(c.course_code) ||
+                      add.isPending ||
+                      courses.isPending ||
+                      !!courses.error
+                    }
+                    busy={add.isPending && add.variables === c.course_code}
+                    onClick={() => add.mutate(c.course_code)}
+                  >
+                    {done.has(c.course_code) ? "منجز" : "إضافة"}
+                  </Button>
+                </div>
+              ))}
+              <div className="pagination small-pagination">
+                <Button
+                  variant="ghost"
+                  disabled={page === 1}
+                  onClick={() => setPage(page - 1)}
+                >
+                  السابق
+                </Button>
+                <small>صفحة {number(page)}</small>
+                <Button
+                  variant="ghost"
+                  disabled={page * 5 >= available.data.pagination.total}
+                  onClick={() => setPage(page + 1)}
+                >
+                  التالي
+                </Button>
+              </div>
+            </>
+          ) : (
+            <Empty
+              title="لا توجد نتائج"
+              description="جرّبي اسمًا أو رمزًا آخر."
+            />
+          )}
+          <p className="helper">
+            لا تُضاف المتطلبات السابقة تلقائيًا عند إعلان إنجاز مساق.
+          </p>
+        </section>
+      </div>
+      {confirm && (
+        <Confirm
+          title="إزالة إعلان الإنجاز؟"
+          description={`سيُزال ${confirm.name_ar} من إنجازات خطتك الحالية فقط. لن يُحذف المساق من الخطة أو الدليل.`}
+          busy={remove.isPending}
+          onClose={() => setConfirm(null)}
+          onConfirm={() => remove.mutate(confirm.course_code)}
+        />
+      )}
+    </>
+  );
 }
-export function ProgressPage() { const query = useProgress(); if (query.error) return <ErrorState error={query.error} retry={() => void query.refetch()} />; if (query.isPending) return <Skeleton />; const p = query.data; return <><PageHeader eyebrow="معلوماتك كما هي" title="التقدم الأكاديمي" description="تتبعي المساقات والساعات المعروفة دون اعتبار كل الخيارات الاختيارية إلزامية." /><div className="stats-grid"><Stat label="الساعات المنجزة المعروفة" value={number(p.known_completed_credit_hours)} hint={`${number(p.completed_credit_summary.unknown_credit_course_count)} مساق منجز بساعات مجهولة`} icon={<GraduationCap />} /><Stat label="إجباري منجز" value={number(p.completed_required_courses)} hint="وفق التصنيف المعروف في خطتك" icon={<BookOpen />} /><Stat label="اختياري منجز" value={number(p.completed_elective_courses)} hint={`${number(p.completed_elective_hours)} ساعة اختيارية`} icon={<CheckCheck />} /><Stat label="مساقات غير منجزة" value={number(p.remaining_course_count)} hint="تشمل البدائل والخيارات الاختيارية" icon={<Layers3 />} /></div><div className="dashboard-columns"><section className="surface"><div className="section-heading"><h2>متطلبات الاختياري</h2><Badge tone="teal">المطلوب: {number(p.required_elective_hours)} ساعة</Badge></div>{p.elective_groups.length ? p.elective_groups.map(g => <GroupCard group={g} key={g.id} />) : <Empty title="متطلبات الاختياري غير معروفة" description="لم تُسجل أهداف مجموعات الاختياري لهذه الخطة بعد." />}{p.elective_group_totals_may_overlap && <Notice>قد يتاح المساق في أكثر من مجموعة. مجموعات العرض لا تمثل قرارًا بالسماح باحتسابه مرتين.</Notice>}</section><section className="surface"><div className="section-heading"><h2>اكتمال البيانات الأكاديمية</h2><Badge tone="amber">{p.is_degree_audit_complete ? 'بحسب حالة الخادم' : 'غير مكتملة'}</Badge></div><div className="audit-status"><ShieldCheck size={35} /><h3>الوضوح أهم من رقم غير دقيق</h3><p>لا يمكن تأكيد اكتمال متطلبات الدرجة أو احتساب نسبة تخرج رسمية من البيانات الحالية.</p></div><dl className="review"><div><dt>إجمالي ساعات الخطة</dt><dd>{number(p.total_plan_credit_hours)}</dd></div><div><dt>تصنيف الإنجاز غير المتحقق</dt><dd>{number(p.completed_unverified_courses)} مساق</dd></div><div><dt>ساعات منجزة غير معروفة</dt><dd>{number(p.completed_credit_summary.unknown_credit_course_count)} مساق</dd></div></dl><ul className="limitation-list">{p.degree_audit_limitations.map(code => <li key={code}>{{ DEGREE_WIDE_REQUIREMENTS_NOT_FULLY_SUPPLIED: 'بقية متطلبات الدرجة لم تُقدم كاملة.', UNVERIFIED_CLASSIFICATIONS: 'تصنيف بعض مساقات الخطة غير متحقق.', UNKNOWN_CREDIT_HOURS: 'ساعات بعض مساقات الخطة غير معروفة.' }[code] ?? 'توجد معلومات أكاديمية تحتاج استكمالًا.'}</li>)}</ul></section></div><Completeness /></>; }
-
-
-
+export function ProgressPage() {
+  const query = useProgress();
+  if (query.error)
+    return (
+      <ErrorState error={query.error} retry={() => void query.refetch()} />
+    );
+  if (query.isPending) return <Skeleton />;
+  const p = query.data;
+  return (
+    <>
+      <PageHeader
+        eyebrow="معلوماتك كما هي"
+        title="التقدم الأكاديمي"
+        description="تتبعي المساقات والساعات المعروفة دون اعتبار كل الخيارات الاختيارية إلزامية."
+      />
+      <div className="stats-grid">
+        <Stat
+          label="الساعات المنجزة المعروفة"
+          value={number(p.known_completed_credit_hours)}
+          hint={`${number(p.completed_credit_summary.unknown_credit_course_count)} مساق منجز بساعات مجهولة`}
+          icon={<GraduationCap />}
+        />
+        <Stat
+          label="إجباري منجز"
+          value={number(p.completed_required_courses)}
+          hint="وفق التصنيف المعروف في خطتك"
+          icon={<BookOpen />}
+        />
+        <Stat
+          label="اختياري منجز"
+          value={number(p.completed_elective_courses)}
+          hint={`${number(p.completed_elective_hours)} ساعة اختيارية`}
+          icon={<CheckCheck />}
+        />
+        <Stat
+          label="مساقات غير منجزة"
+          value={number(p.remaining_course_count)}
+          hint="تشمل البدائل والخيارات الاختيارية"
+          icon={<Layers3 />}
+        />
+      </div>
+      <div className="dashboard-columns">
+        <section className="surface">
+          <div className="section-heading">
+            <h2>متطلبات الاختياري</h2>
+            <Badge tone="teal">
+              المطلوب: {number(p.required_elective_hours)} ساعة
+            </Badge>
+          </div>
+          {p.elective_groups.length ? (
+            p.elective_groups.map((g) => <GroupCard group={g} key={g.id} />)
+          ) : (
+            <Empty
+              title="متطلبات الاختياري غير معروفة"
+              description="لم تُسجل أهداف مجموعات الاختياري لهذه الخطة بعد."
+            />
+          )}
+          {p.elective_group_totals_may_overlap && (
+            <Notice>
+              قد يتاح المساق في أكثر من مجموعة. مجموعات العرض لا تمثل قرارًا
+              بالسماح باحتسابه مرتين.
+            </Notice>
+          )}
+        </section>
+        <section className="surface">
+          <div className="section-heading">
+            <h2>اكتمال البيانات الأكاديمية</h2>
+            <Badge tone="amber">
+              {p.is_degree_audit_complete ? "بحسب حالة الخادم" : "غير مكتملة"}
+            </Badge>
+          </div>
+          <div className="audit-status">
+            <ShieldCheck size={35} />
+            <h3>الوضوح أهم من رقم غير دقيق</h3>
+            <p>
+              لا يمكن تأكيد اكتمال متطلبات الدرجة أو احتساب نسبة تخرج رسمية من
+              البيانات الحالية.
+            </p>
+          </div>
+          <dl className="review">
+            <div>
+              <dt>إجمالي ساعات الخطة</dt>
+              <dd>{number(p.total_plan_credit_hours)}</dd>
+            </div>
+            <div>
+              <dt>تصنيف الإنجاز غير المتحقق</dt>
+              <dd>{number(p.completed_unverified_courses)} مساق</dd>
+            </div>
+            <div>
+              <dt>ساعات منجزة غير معروفة</dt>
+              <dd>
+                {number(p.completed_credit_summary.unknown_credit_course_count)}{" "}
+                مساق
+              </dd>
+            </div>
+          </dl>
+          <ul className="limitation-list">
+            {p.degree_audit_limitations.map((code) => (
+              <li key={code}>
+                {{
+                  DEGREE_WIDE_REQUIREMENTS_NOT_FULLY_SUPPLIED:
+                    "بقية متطلبات الدرجة لم تُقدم كاملة.",
+                  UNVERIFIED_CLASSIFICATIONS:
+                    "تصنيف بعض مساقات الخطة غير متحقق.",
+                  UNKNOWN_CREDIT_HOURS: "ساعات بعض مساقات الخطة غير معروفة.",
+                }[code] ?? "توجد معلومات أكاديمية تحتاج استكمالًا."}
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+      <Completeness />
+    </>
+  );
+}

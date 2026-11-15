@@ -1,36 +1,680 @@
-import {useEffect,useState} from 'react';
-import {Link,useNavigate,useParams} from 'react-router-dom';
-import {useMutation} from '@tanstack/react-query';
-import {Plus,Trash2,Pencil,CheckCircle2,Clock3,BookOpen,Timer,ArrowLeft} from 'lucide-react';
-import {api,errorMessage} from '../api/client';
-import type {Result} from '../api/types';
-import type {Task,TaskPage,Priority,TaskStatus,ProductivitySummary} from '../api/productivity';
-import {Badge,Button,Confirm,Empty,ErrorState,Input,Modal,PageHeader,Select,Skeleton,Stat,number,useToast} from '../components/ui';
-import {prefix,useCourses,useProductivityQuery,useProductivityRefresh,useTimezone} from './hooks';
-import {dayLabel,timestampLabel,dateKey} from './time';
-export const priorityLabel={LOW:'منخفضة',MEDIUM:'متوسطة',HIGH:'عالية'};
-export const statusLabel={TODO:'لم تبدأ',IN_PROGRESS:'قيد العمل',COMPLETED:'مكتملة'};
-export function CourseSelect({value,onChange,previous}:{value:string;onChange:(s:string)=>void;previous?:{course_code:string|null;course_name:string|null}}){const courses=useCourses();return <Select label="المساق المرتبط (اختياري)" value={value} onChange={e=>onChange(e.target.value)} disabled={courses.isPending||!!courses.error}><option value="">دون مساق</option>{previous?.course_code&&!courses.data?.data.some(c=>c.course_code===previous.course_code)&&<option value={previous.course_code}>{previous.course_code} · {previous.course_name} (الخطة السابقة)</option>}{courses.data?.data.map(c=><option key={c.course_code} value={c.course_code}>{c.course_code} · {c.name_ar}</option>)}</Select>;}
-export function TaskEditor({task,day,onClose}:{task?:Task;day?:string;onClose:()=>void}){
- const timezone=useTimezone(),refresh=useProductivityRefresh(),toast=useToast();
- const [title,setTitle]=useState(task?.title??''),[description,setDescription]=useState(task?.description??''),[priority,setPriority]=useState<Priority>(task?.priority??'MEDIUM'),[status,setStatus]=useState<TaskStatus>(task?.status??'TODO'),[due,setDue]=useState(task?.due_date??day??''),[time,setTime]=useState(task?.due_time??''),[zone,setZone]=useState(task?.timezone??timezone),[course,setCourse]=useState(task?.course_code??'');
- const save=useMutation({mutationFn:()=>api.mutate<Result<Task>>(prefix+'/tasks'+(task?'/'+task.id:''),task?'PATCH':'POST',{title:title.trim(),description:description.trim()||null,priority,status,due_date:due||null,due_time:due&&time?time:null,timezone:zone,...(!task||course!==(task.course_code??'')?{course_code:course||null}:{}),...(task?{expected_revision:task.revision}:{})}),onSuccess:async()=>{await refresh();toast(task?'حُفظت تعديلات المهمة.':'أضيفت المهمة، وسيظهر موعدها في التقويم.');onClose();},onError:e=>{toast(errorMessage(e),'error');void refresh();}});
- return <Modal title={task?'تعديل المهمة':'مهمة جديدة'} onClose={()=>{if(!save.isPending)onClose();}}><form onSubmit={e=>{e.preventDefault();save.mutate();}} className="productivity-form"><Input label="عنوان المهمة" required maxLength={200} value={title} onChange={e=>setTitle(e.target.value)}/><div className="field"><label htmlFor="task-description">الوصف (اختياري)</label><textarea id="task-description" maxLength={5000} rows={3} value={description} onChange={e=>setDescription(e.target.value)}/></div><div className="form-two"><Select label="الأولوية" value={priority} onChange={e=>setPriority(e.target.value as Priority)}>{Object.entries(priorityLabel).map(([key,label])=><option key={key} value={key}>{label}</option>)}</Select><Select label="حالة المهمة" value={status} onChange={e=>setStatus(e.target.value as TaskStatus)}>{Object.entries(statusLabel).map(([key,label])=><option key={key} value={key}>{label}</option>)}</Select><Input label="تاريخ الاستحقاق (اختياري)" type="date" min="2000-01-01" max="2199-12-31" value={due} onChange={e=>{setDue(e.target.value);if(!e.target.value)setTime('');}}/><Input label="وقت الاستحقاق (اختياري)" type="time" disabled={!due} value={time} onChange={e=>setTime(e.target.value)}/></div><Input label="المنطقة الزمنية للموعد" required value={zone} onChange={e=>setZone(e.target.value)} hint="مثل Asia/Hebron أو UTC. الموعد دون وقت يستحق في نهاية ذلك اليوم."/><CourseSelect value={course} onChange={setCourse} previous={task}/><div className="dialog-actions"><Button variant="secondary" type="button" disabled={save.isPending} onClick={onClose}>إلغاء</Button><Button type="submit" busy={save.isPending}>حفظ المهمة</Button></div></form></Modal>;
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import {
+  Plus,
+  Trash2,
+  Pencil,
+  CheckCircle2,
+  Clock3,
+  BookOpen,
+  Timer,
+  ArrowLeft,
+} from "lucide-react";
+import { api, errorMessage } from "../api/client";
+import type { Result } from "../api/types";
+import type {
+  Task,
+  TaskPage,
+  Priority,
+  TaskStatus,
+  ProductivitySummary,
+} from "../api/productivity";
+import {
+  Badge,
+  Button,
+  Confirm,
+  Empty,
+  ErrorState,
+  Input,
+  Modal,
+  PageHeader,
+  Select,
+  Skeleton,
+  Stat,
+  number,
+  useToast,
+} from "../components/ui";
+import {
+  prefix,
+  useCourses,
+  useProductivityQuery,
+  useProductivityRefresh,
+  useTimezone,
+} from "./hooks";
+import { dayLabel, timestampLabel, dateKey } from "./time";
+export const priorityLabel = { LOW: "منخفضة", MEDIUM: "متوسطة", HIGH: "عالية" };
+export const statusLabel = {
+  TODO: "لم تبدأ",
+  IN_PROGRESS: "قيد العمل",
+  COMPLETED: "مكتملة",
+};
+export function CourseSelect({
+  value,
+  onChange,
+  previous,
+}: {
+  value: string;
+  onChange: (s: string) => void;
+  previous?: { course_code: string | null; course_name: string | null };
+}) {
+  const courses = useCourses();
+  return (
+    <Select
+      label="المساق المرتبط (اختياري)"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      disabled={courses.isPending || !!courses.error}
+    >
+      <option value="">دون مساق</option>
+      {previous?.course_code &&
+        !courses.data?.data.some(
+          (c) => c.course_code === previous.course_code,
+        ) && (
+          <option value={previous.course_code}>
+            {previous.course_code} · {previous.course_name} (الخطة السابقة)
+          </option>
+        )}
+      {courses.data?.data.map((c) => (
+        <option key={c.course_code} value={c.course_code}>
+          {c.course_code} · {c.name_ar}
+        </option>
+      ))}
+    </Select>
+  );
 }
-export function TaskRow({task,onEdit,onDelete,onStatus}:{task:Task;onEdit?:()=>void;onDelete?:()=>void;onStatus?:(status:TaskStatus)=>void}){return <article className={`task-row ${task.status==='COMPLETED'?'task-completed':''}`}><button className={`task-check ${task.status==='COMPLETED'?'checked':''}`} aria-label={`${task.status==='COMPLETED'?'إعادة فتح':'إكمال'} المهمة ${task.title}`} onClick={()=>onStatus?.(task.status==='COMPLETED'?'TODO':'COMPLETED')} disabled={!onStatus}><CheckCircle2 size={21}/></button><div className="task-main"><Link to={`/app/tasks/${task.id}`} className="task-title">{task.title}</Link><div className="task-chips"><Badge tone={task.priority==='HIGH'?'amber':'neutral'}>أولوية {priorityLabel[task.priority]}</Badge><Badge tone={task.status==='COMPLETED'?'teal':task.status==='IN_PROGRESS'?'blue':'neutral'}>{statusLabel[task.status]}</Badge>{task.is_overdue&&<Badge tone="amber">متأخرة</Badge>}{task.course_code&&<span><BookOpen size={13}/><bdi>{task.course_code}</bdi></span>}</div><p className="task-deadline"><Clock3 size={14}/>{task.due_date?`${dayLabel(task.due_date)}${task.due_time?' · '+task.due_time:' · نهاية اليوم'} · ${task.timezone}`:'دون موعد محدد'}</p></div><div className="task-actions">{onEdit&&<button className="icon-btn" aria-label={`تعديل المهمة ${task.title}`} onClick={onEdit}><Pencil size={17}/></button>}{onDelete&&<button className="icon-btn remove-btn" aria-label={`حذف المهمة ${task.title}`} onClick={onDelete}><Trash2 size={17}/></button>}</div></article>;}
-export function TasksPage(){
- const zone=useTimezone(),refresh=useProductivityRefresh(),toast=useToast(),navigate=useNavigate(),{taskId}=useParams();
- const [search,setSearch]=useState(''),[debounced,setDebounced]=useState(''),[view,setView]=useState('ALL'),[status,setStatus]=useState(''),[priority,setPriority]=useState(''),[sort,setSort]=useState('DEADLINE'),[page,setPage]=useState(1),[editor,setEditor]=useState<Task|'NEW'|null>(null),[deleting,setDeleting]=useState<Task|null>(null);
- useEffect(()=>{const timer=setTimeout(()=>{setDebounced(search);setPage(1);},300);return()=>clearTimeout(timer);},[search]);
- const params=new URLSearchParams({timezone:zone,page:String(page),limit:'12',view,sort,...(debounced?{search:debounced}:{}),...(status?{status}:{}),...(priority?{priority}:{})});
- const list=useProductivityQuery<TaskPage>('tasks','/tasks?'+params),detail=useProductivityQuery<Result<Task>>('task','/tasks/'+taskId,!!taskId);
- const change=useMutation({mutationFn:({task,status}:{task:Task;status:TaskStatus})=>api.mutate(prefix+'/tasks/'+task.id,'PATCH',{status,expected_revision:task.revision}),onSuccess:async()=>{await refresh();toast('حُدثت حالة المهمة في القائمة والتقويم.');},onError:e=>{toast(errorMessage(e),'error');void refresh();}});
- const remove=useMutation({mutationFn:()=>api.mutate(prefix+'/tasks/'+deleting!.id,'DELETE',{expected_revision:deleting!.revision}),onSuccess:async()=>{if(taskId===deleting?.id)navigate('/app/tasks');setDeleting(null);await refresh();toast('حُذفت المهمة من القائمة والتقويم.');},onError:e=>{toast(errorMessage(e),'error');void refresh();}});
- const filter=(setter:(v:string)=>void,value:string)=>{setter(value);setPage(1);};
- return <><PageHeader eyebrow="خطوة صغيرة، إنجاز واضح" title="المهام" description="نظّمي مهامك ومواعيدك، واربطيها بمساقات خطتك عندما يناسبك." action={<Button onClick={()=>setEditor('NEW')}><Plus size={17}/>مهمة جديدة</Button>}/><div className="productivity-tabs" aria-label="عرض المهام">{[['ALL','كل المهام'],['TODAY','اليوم'],['UPCOMING','القادمة'],['OVERDUE','المتأخرة'],['COMPLETED','المكتملة']].map(([key,label])=><button key={key} className={view===key?'active':''} aria-pressed={view===key} onClick={()=>filter(setView,key)}>{label}</button>)}</div><section className="surface productivity-filters"><Input label="البحث في المهام" placeholder="عنوان، وصف أو رمز مساق" value={search} onChange={e=>setSearch(e.target.value)}/><Select label="تصفية الحالة" value={status} onChange={e=>filter(setStatus,e.target.value)}><option value="">كل الحالات</option>{Object.entries(statusLabel).map(([key,label])=><option key={key} value={key}>{label}</option>)}</Select><Select label="تصفية الأولوية" value={priority} onChange={e=>filter(setPriority,e.target.value)}><option value="">كل الأولويات</option>{Object.entries(priorityLabel).map(([key,label])=><option key={key} value={key}>{label}</option>)}</Select><Select label="ترتيب المهام" value={sort} onChange={e=>filter(setSort,e.target.value)}><option value="DEADLINE">الموعد الأقرب</option><option value="PRIORITY">الأولوية الأعلى</option><option value="CREATED">الأحدث إنشاءً</option></Select></section><section className="surface task-list-surface"><div className="section-heading"><h2>قائمتك</h2><Badge>{list.data?number(list.data.pagination.total):'…'} مهمة</Badge></div>{list.error?<ErrorState error={list.error} retry={()=>void list.refetch()}/>:list.isPending?<Skeleton/>:list.data.data.length?list.data.data.map(task=><TaskRow key={task.id} task={task} onEdit={()=>setEditor(task)} onDelete={()=>setDeleting(task)} onStatus={change.isPending?undefined:status=>change.mutate({task,status})}/>):<Empty title="مساحة لإنجاز جديد" description="لا توجد مهام مطابقة لهذا العرض. أضيفي مهمة أو غيّري الفلاتر."/>}<div className="pagination"><Button variant="secondary" disabled={page===1} onClick={()=>setPage(page-1)}>السابق</Button><span>صفحة {number(page)}</span><Button variant="secondary" disabled={!list.data||page*12>=list.data.pagination.total} onClick={()=>setPage(page+1)}>التالي</Button></div></section>
- {taskId&&!editor&&<Modal title={detail.data?.data.title??'تفاصيل المهمة'} onClose={()=>navigate('/app/tasks')}>{detail.error?<ErrorState error={detail.error}/>:detail.isPending?<Skeleton/>:<><TaskRow task={detail.data.data}/><p className="event-description">{detail.data.data.description||'لم يُضف وصف لهذه المهمة.'}</p><p className="muted">{detail.data.data.course_name}</p><div className="dialog-actions"><Link className="btn btn-secondary" to={`/app/pomodoro?task=${taskId}`}><Timer size={17}/>تركيز على المهمة</Link><Button variant="secondary" onClick={()=>setEditor(detail.data!.data)}>تعديل المهمة</Button><Button variant="danger" onClick={()=>setDeleting(detail.data!.data)}>حذف المهمة</Button></div></>}</Modal>}
- {editor&&<TaskEditor task={editor==='NEW'?undefined:editor} onClose={()=>setEditor(null)}/>} {deleting&&<Confirm title="حذف المهمة؟" description={`ستُحذف «${deleting.title}» من مهامك وتقويمك. سجل جلسات التركيز المكتملة يبقى محفوظًا.`} busy={remove.isPending} onConfirm={()=>remove.mutate()} onClose={()=>setDeleting(null)}/>}</>;
+export function TaskEditor({
+  task,
+  day,
+  onClose,
+}: {
+  task?: Task;
+  day?: string;
+  onClose: () => void;
+}) {
+  const timezone = useTimezone(),
+    refresh = useProductivityRefresh(),
+    toast = useToast();
+  const [title, setTitle] = useState(task?.title ?? ""),
+    [description, setDescription] = useState(task?.description ?? ""),
+    [priority, setPriority] = useState<Priority>(task?.priority ?? "MEDIUM"),
+    [status, setStatus] = useState<TaskStatus>(task?.status ?? "TODO"),
+    [due, setDue] = useState(task?.due_date ?? day ?? ""),
+    [time, setTime] = useState(task?.due_time ?? ""),
+    [zone, setZone] = useState(task?.timezone ?? timezone),
+    [course, setCourse] = useState(task?.course_code ?? "");
+  const save = useMutation({
+    mutationFn: () =>
+      api.mutate<Result<Task>>(
+        prefix + "/tasks" + (task ? "/" + task.id : ""),
+        task ? "PATCH" : "POST",
+        {
+          title: title.trim(),
+          description: description.trim() || null,
+          priority,
+          status,
+          due_date: due || null,
+          due_time: due && time ? time : null,
+          timezone: zone,
+          ...(!task || course !== (task.course_code ?? "")
+            ? { course_code: course || null }
+            : {}),
+          ...(task ? { expected_revision: task.revision } : {}),
+        },
+      ),
+    onSuccess: async () => {
+      await refresh();
+      toast(
+        task
+          ? "حُفظت تعديلات المهمة."
+          : "أضيفت المهمة، وسيظهر موعدها في التقويم.",
+      );
+      onClose();
+    },
+    onError: (e) => {
+      toast(errorMessage(e), "error");
+      void refresh();
+    },
+  });
+  return (
+    <Modal
+      title={task ? "تعديل المهمة" : "مهمة جديدة"}
+      onClose={() => {
+        if (!save.isPending) onClose();
+      }}
+    >
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          save.mutate();
+        }}
+        className="productivity-form"
+      >
+        <Input
+          label="عنوان المهمة"
+          required
+          maxLength={200}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <div className="field">
+          <label htmlFor="task-description">الوصف (اختياري)</label>
+          <textarea
+            id="task-description"
+            maxLength={5000}
+            rows={3}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+        <div className="form-two">
+          <Select
+            label="الأولوية"
+            value={priority}
+            onChange={(e) => setPriority(e.target.value as Priority)}
+          >
+            {Object.entries(priorityLabel).map(([key, label]) => (
+              <option key={key} value={key}>
+                {label}
+              </option>
+            ))}
+          </Select>
+          <Select
+            label="حالة المهمة"
+            value={status}
+            onChange={(e) => setStatus(e.target.value as TaskStatus)}
+          >
+            {Object.entries(statusLabel).map(([key, label]) => (
+              <option key={key} value={key}>
+                {label}
+              </option>
+            ))}
+          </Select>
+          <Input
+            label="تاريخ الاستحقاق (اختياري)"
+            type="date"
+            min="2000-01-01"
+            max="2199-12-31"
+            value={due}
+            onChange={(e) => {
+              setDue(e.target.value);
+              if (!e.target.value) setTime("");
+            }}
+          />
+          <Input
+            label="وقت الاستحقاق (اختياري)"
+            type="time"
+            disabled={!due}
+            value={time}
+            onChange={(e) => setTime(e.target.value)}
+          />
+        </div>
+        <Input
+          label="المنطقة الزمنية للموعد"
+          required
+          value={zone}
+          onChange={(e) => setZone(e.target.value)}
+          hint="مثل Asia/Hebron أو UTC. الموعد دون وقت يستحق في نهاية ذلك اليوم."
+        />
+        <CourseSelect value={course} onChange={setCourse} previous={task} />
+        <div className="dialog-actions">
+          <Button
+            variant="secondary"
+            type="button"
+            disabled={save.isPending}
+            onClick={onClose}
+          >
+            إلغاء
+          </Button>
+          <Button type="submit" busy={save.isPending}>
+            حفظ المهمة
+          </Button>
+        </div>
+      </form>
+    </Modal>
+  );
 }
-export function ProductivityDashboard(){const zone=useTimezone(),q=useProductivityQuery<Result<ProductivitySummary>>('summary','/productivity/summary?timezone='+encodeURIComponent(zone)),[creating,setCreating]=useState(false);
- return <section className="productivity-dashboard"><div className="section-heading"><div><span className="section-kicker">وقت لإنجازك</span><h2>صورة اليوم</h2></div><div className="inline-actions"><Button variant="secondary" onClick={()=>setCreating(true)}><Plus size={16}/>مهمة جديدة</Button><Link className="btn btn-primary" to="/app/pomodoro"><Timer size={16}/>ابدئي التركيز</Link></div></div>{q.error?<ErrorState error={q.error} retry={()=>void q.refetch()}/>:q.isPending?<Skeleton/>:<><div className="stats-grid"><Stat label="مهام اليوم" value={number(q.data.data.today_tasks.length)} hint="حسب مواعيد الاستحقاق" icon={<CheckCircle2/>}/><Stat label="مهام متأخرة" value={number(q.data.data.overdue_count)} hint="غير مكتملة وقد تجاوزت الموعد" icon={<Clock3/>}/><Stat label="أكملتِ اليوم" value={number(q.data.data.completed_today)} hint="حسب وقت إكمال المهمة" icon={<CheckCircle2/>}/><Stat label="دقائق التركيز اليوم" value={number(q.data.data.focus.today_focus_minutes)} hint="من جلسات التركيز المكتملة فقط" icon={<Timer/>}/></div><div className="dashboard-columns"><section className="surface"><div className="section-heading"><h3>مهام اليوم</h3><Link to="/app/tasks">عرض المهام<ArrowLeft size={15}/></Link></div>{q.data.data.today_tasks.length?q.data.data.today_tasks.slice(0,5).map(t=><TaskRow key={t.id} task={t}/>):<Empty title="يوم بلا مواعيد مهام" description="يمكنك اختيار مهمة دون موعد أو إنشاء واحدة جديدة."/>}</section><section className="surface"><h3>مواعيد الاستحقاق القادمة</h3>{q.data.data.upcoming_tasks.length?q.data.data.upcoming_tasks.map(t=><Link className="upcoming-item" key={t.id} to={`/app/tasks/${t.id}`}><span>{t.title}</span><small>{timestampLabel(t.due_at,zone)}</small></Link>):<Empty title="لا مواعيد قادمة" description="ستظهر هنا المهام التي أضفتِ لها موعدًا."/>}</section></div></>}{creating&&<TaskEditor day={dateKey(new Date(),zone)} onClose={()=>setCreating(false)}/>}</section>;
+export function TaskRow({
+  task,
+  onEdit,
+  onDelete,
+  onStatus,
+}: {
+  task: Task;
+  onEdit?: () => void;
+  onDelete?: () => void;
+  onStatus?: (status: TaskStatus) => void;
+}) {
+  return (
+    <article
+      className={`task-row ${task.status === "COMPLETED" ? "task-completed" : ""}`}
+    >
+      <button
+        className={`task-check ${task.status === "COMPLETED" ? "checked" : ""}`}
+        aria-label={`${task.status === "COMPLETED" ? "إعادة فتح" : "إكمال"} المهمة ${task.title}`}
+        onClick={() =>
+          onStatus?.(task.status === "COMPLETED" ? "TODO" : "COMPLETED")
+        }
+        disabled={!onStatus}
+      >
+        <CheckCircle2 size={21} />
+      </button>
+      <div className="task-main">
+        <Link to={`/app/tasks/${task.id}`} className="task-title">
+          {task.title}
+        </Link>
+        <div className="task-chips">
+          <Badge tone={task.priority === "HIGH" ? "amber" : "neutral"}>
+            أولوية {priorityLabel[task.priority]}
+          </Badge>
+          <Badge
+            tone={
+              task.status === "COMPLETED"
+                ? "teal"
+                : task.status === "IN_PROGRESS"
+                  ? "blue"
+                  : "neutral"
+            }
+          >
+            {statusLabel[task.status]}
+          </Badge>
+          {task.is_overdue && <Badge tone="amber">متأخرة</Badge>}
+          {task.course_code && (
+            <span>
+              <BookOpen size={13} />
+              <bdi>{task.course_code}</bdi>
+            </span>
+          )}
+        </div>
+        <p className="task-deadline">
+          <Clock3 size={14} />
+          {task.due_date
+            ? `${dayLabel(task.due_date)}${task.due_time ? " · " + task.due_time : " · نهاية اليوم"} · ${task.timezone}`
+            : "دون موعد محدد"}
+        </p>
+      </div>
+      <div className="task-actions">
+        {onEdit && (
+          <button
+            className="icon-btn"
+            aria-label={`تعديل المهمة ${task.title}`}
+            onClick={onEdit}
+          >
+            <Pencil size={17} />
+          </button>
+        )}
+        {onDelete && (
+          <button
+            className="icon-btn remove-btn"
+            aria-label={`حذف المهمة ${task.title}`}
+            onClick={onDelete}
+          >
+            <Trash2 size={17} />
+          </button>
+        )}
+      </div>
+    </article>
+  );
+}
+export function TasksPage() {
+  const zone = useTimezone(),
+    refresh = useProductivityRefresh(),
+    toast = useToast(),
+    navigate = useNavigate(),
+    { taskId } = useParams();
+  const [search, setSearch] = useState(""),
+    [debounced, setDebounced] = useState(""),
+    [view, setView] = useState("ALL"),
+    [status, setStatus] = useState(""),
+    [priority, setPriority] = useState(""),
+    [sort, setSort] = useState("DEADLINE"),
+    [page, setPage] = useState(1),
+    [editor, setEditor] = useState<Task | "NEW" | null>(null),
+    [deleting, setDeleting] = useState<Task | null>(null);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebounced(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+  const params = new URLSearchParams({
+    timezone: zone,
+    page: String(page),
+    limit: "12",
+    view,
+    sort,
+    ...(debounced ? { search: debounced } : {}),
+    ...(status ? { status } : {}),
+    ...(priority ? { priority } : {}),
+  });
+  const list = useProductivityQuery<TaskPage>("tasks", "/tasks?" + params),
+    detail = useProductivityQuery<Result<Task>>(
+      "task",
+      "/tasks/" + taskId,
+      !!taskId,
+    );
+  const change = useMutation({
+    mutationFn: ({ task, status }: { task: Task; status: TaskStatus }) =>
+      api.mutate(prefix + "/tasks/" + task.id, "PATCH", {
+        status,
+        expected_revision: task.revision,
+      }),
+    onSuccess: async () => {
+      await refresh();
+      toast("حُدثت حالة المهمة في القائمة والتقويم.");
+    },
+    onError: (e) => {
+      toast(errorMessage(e), "error");
+      void refresh();
+    },
+  });
+  const remove = useMutation({
+    mutationFn: () =>
+      api.mutate(prefix + "/tasks/" + deleting!.id, "DELETE", {
+        expected_revision: deleting!.revision,
+      }),
+    onSuccess: async () => {
+      if (taskId === deleting?.id) navigate("/app/tasks");
+      setDeleting(null);
+      await refresh();
+      toast("حُذفت المهمة من القائمة والتقويم.");
+    },
+    onError: (e) => {
+      toast(errorMessage(e), "error");
+      void refresh();
+    },
+  });
+  const filter = (setter: (v: string) => void, value: string) => {
+    setter(value);
+    setPage(1);
+  };
+  return (
+    <>
+      <PageHeader
+        eyebrow="خطوة صغيرة، إنجاز واضح"
+        title="المهام"
+        description="نظّمي مهامك ومواعيدك، واربطيها بمساقات خطتك عندما يناسبك."
+        action={
+          <Button onClick={() => setEditor("NEW")}>
+            <Plus size={17} />
+            مهمة جديدة
+          </Button>
+        }
+      />
+      <div className="productivity-tabs" aria-label="عرض المهام">
+        {[
+          ["ALL", "كل المهام"],
+          ["TODAY", "اليوم"],
+          ["UPCOMING", "القادمة"],
+          ["OVERDUE", "المتأخرة"],
+          ["COMPLETED", "المكتملة"],
+        ].map(([key, label]) => (
+          <button
+            key={key}
+            className={view === key ? "active" : ""}
+            aria-pressed={view === key}
+            onClick={() => filter(setView, key)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      <section className="surface productivity-filters">
+        <Input
+          label="البحث في المهام"
+          placeholder="عنوان، وصف أو رمز مساق"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <Select
+          label="تصفية الحالة"
+          value={status}
+          onChange={(e) => filter(setStatus, e.target.value)}
+        >
+          <option value="">كل الحالات</option>
+          {Object.entries(statusLabel).map(([key, label]) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
+        </Select>
+        <Select
+          label="تصفية الأولوية"
+          value={priority}
+          onChange={(e) => filter(setPriority, e.target.value)}
+        >
+          <option value="">كل الأولويات</option>
+          {Object.entries(priorityLabel).map(([key, label]) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
+        </Select>
+        <Select
+          label="ترتيب المهام"
+          value={sort}
+          onChange={(e) => filter(setSort, e.target.value)}
+        >
+          <option value="DEADLINE">الموعد الأقرب</option>
+          <option value="PRIORITY">الأولوية الأعلى</option>
+          <option value="CREATED">الأحدث إنشاءً</option>
+        </Select>
+      </section>
+      <section className="surface task-list-surface">
+        <div className="section-heading">
+          <h2>قائمتك</h2>
+          <Badge>
+            {list.data ? number(list.data.pagination.total) : "…"} مهمة
+          </Badge>
+        </div>
+        {list.error ? (
+          <ErrorState error={list.error} retry={() => void list.refetch()} />
+        ) : list.isPending ? (
+          <Skeleton />
+        ) : list.data.data.length ? (
+          list.data.data.map((task) => (
+            <TaskRow
+              key={task.id}
+              task={task}
+              onEdit={() => setEditor(task)}
+              onDelete={() => setDeleting(task)}
+              onStatus={
+                change.isPending
+                  ? undefined
+                  : (status) => change.mutate({ task, status })
+              }
+            />
+          ))
+        ) : (
+          <Empty
+            title="مساحة لإنجاز جديد"
+            description="لا توجد مهام مطابقة لهذا العرض. أضيفي مهمة أو غيّري الفلاتر."
+          />
+        )}
+        <div className="pagination">
+          <Button
+            variant="secondary"
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+          >
+            السابق
+          </Button>
+          <span>صفحة {number(page)}</span>
+          <Button
+            variant="secondary"
+            disabled={!list.data || page * 12 >= list.data.pagination.total}
+            onClick={() => setPage(page + 1)}
+          >
+            التالي
+          </Button>
+        </div>
+      </section>
+      {taskId && !editor && (
+        <Modal
+          title={detail.data?.data.title ?? "تفاصيل المهمة"}
+          onClose={() => navigate("/app/tasks")}
+        >
+          {detail.error ? (
+            <ErrorState error={detail.error} />
+          ) : detail.isPending ? (
+            <Skeleton />
+          ) : (
+            <>
+              <TaskRow task={detail.data.data} />
+              <p className="event-description">
+                {detail.data.data.description || "لم يُضف وصف لهذه المهمة."}
+              </p>
+              <p className="muted">{detail.data.data.course_name}</p>
+              <div className="dialog-actions">
+                <Link
+                  className="btn btn-secondary"
+                  to={`/app/pomodoro?task=${taskId}`}
+                >
+                  <Timer size={17} />
+                  تركيز على المهمة
+                </Link>
+                <Button
+                  variant="secondary"
+                  onClick={() => setEditor(detail.data!.data)}
+                >
+                  تعديل المهمة
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => setDeleting(detail.data!.data)}
+                >
+                  حذف المهمة
+                </Button>
+              </div>
+            </>
+          )}
+        </Modal>
+      )}
+      {editor && (
+        <TaskEditor
+          task={editor === "NEW" ? undefined : editor}
+          onClose={() => setEditor(null)}
+        />
+      )}{" "}
+      {deleting && (
+        <Confirm
+          title="حذف المهمة؟"
+          description={`ستُحذف «${deleting.title}» من مهامك وتقويمك. سجل جلسات التركيز المكتملة يبقى محفوظًا.`}
+          busy={remove.isPending}
+          onConfirm={() => remove.mutate()}
+          onClose={() => setDeleting(null)}
+        />
+      )}
+    </>
+  );
+}
+export function ProductivityDashboard() {
+  const zone = useTimezone(),
+    q = useProductivityQuery<Result<ProductivitySummary>>(
+      "summary",
+      "/productivity/summary?timezone=" + encodeURIComponent(zone),
+    ),
+    [creating, setCreating] = useState(false);
+  return (
+    <section className="productivity-dashboard">
+      <div className="section-heading">
+        <div>
+          <span className="section-kicker">وقت لإنجازك</span>
+          <h2>صورة اليوم</h2>
+        </div>
+        <div className="inline-actions">
+          <Button variant="secondary" onClick={() => setCreating(true)}>
+            <Plus size={16} />
+            مهمة جديدة
+          </Button>
+          <Link className="btn btn-primary" to="/app/pomodoro">
+            <Timer size={16} />
+            ابدئي التركيز
+          </Link>
+        </div>
+      </div>
+      {q.error ? (
+        <ErrorState error={q.error} retry={() => void q.refetch()} />
+      ) : q.isPending ? (
+        <Skeleton />
+      ) : (
+        <>
+          <div className="stats-grid">
+            <Stat
+              label="مهام اليوم"
+              value={number(q.data.data.today_tasks.length)}
+              hint="حسب مواعيد الاستحقاق"
+              icon={<CheckCircle2 />}
+            />
+            <Stat
+              label="مهام متأخرة"
+              value={number(q.data.data.overdue_count)}
+              hint="غير مكتملة وقد تجاوزت الموعد"
+              icon={<Clock3 />}
+            />
+            <Stat
+              label="أكملتِ اليوم"
+              value={number(q.data.data.completed_today)}
+              hint="حسب وقت إكمال المهمة"
+              icon={<CheckCircle2 />}
+            />
+            <Stat
+              label="دقائق التركيز اليوم"
+              value={number(q.data.data.focus.today_focus_minutes)}
+              hint="من جلسات التركيز المكتملة فقط"
+              icon={<Timer />}
+            />
+          </div>
+          <div className="dashboard-columns">
+            <section className="surface">
+              <div className="section-heading">
+                <h3>مهام اليوم</h3>
+                <Link to="/app/tasks">
+                  عرض المهام
+                  <ArrowLeft size={15} />
+                </Link>
+              </div>
+              {q.data.data.today_tasks.length ? (
+                q.data.data.today_tasks
+                  .slice(0, 5)
+                  .map((t) => <TaskRow key={t.id} task={t} />)
+              ) : (
+                <Empty
+                  title="يوم بلا مواعيد مهام"
+                  description="يمكنك اختيار مهمة دون موعد أو إنشاء واحدة جديدة."
+                />
+              )}
+            </section>
+            <section className="surface">
+              <h3>مواعيد الاستحقاق القادمة</h3>
+              {q.data.data.upcoming_tasks.length ? (
+                q.data.data.upcoming_tasks.map((t) => (
+                  <Link
+                    className="upcoming-item"
+                    key={t.id}
+                    to={`/app/tasks/${t.id}`}
+                  >
+                    <span>{t.title}</span>
+                    <small>{timestampLabel(t.due_at, zone)}</small>
+                  </Link>
+                ))
+              ) : (
+                <Empty
+                  title="لا مواعيد قادمة"
+                  description="ستظهر هنا المهام التي أضفتِ لها موعدًا."
+                />
+              )}
+            </section>
+          </div>
+        </>
+      )}
+      {creating && (
+        <TaskEditor
+          day={dateKey(new Date(), zone)}
+          onClose={() => setCreating(false)}
+        />
+      )}
+    </section>
+  );
 }
