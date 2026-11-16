@@ -1,0 +1,616 @@
+.study-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 20px;
+}
+.conversation-list {
+  padding: 18px;
+  align-self: start;
+  max-height: 650px;
+  overflow: auto;
+}
+.conversation-list h2 {
+  margin-bottom: 18px;
+}
+.conversation-item {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: 12px;
+  padding: 5px;
+  margin-bottom: 8px;
+}
+.conversation-item.active {
+  background: #e5f4ef;
+}
+.conversation-item > button:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  text-align: start;
+  border: 0;
+  background: none;
+  padding: 10px 4px;
+  color: #173d4d;
+}
+.conversation-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.study-chat {
+  min-width: 0;
+}
+.chat-messages {
+  height: 430px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 3px 16px;
+  scrollbar-gutter: stable;
+}
+.study-message {
+  border-radius: 15px;
+  padding: 16px;
+  max-width: 95%;
+  overflow-wrap: anywhere;
+}
+.student-message {
+  background: #e8f4ef;
+  align-self: flex-start;
+  white-space: pre-wrap;
+}
+.assistant-message {
+  background: #f6f8fa;
+  border: 1px solid #dfe8eb;
+  align-self: stretch;
+}
+.study-message header,
+.study-message footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.study-message header {
+  margin-bottom: 12px;
+}
+.study-message footer {
+  margin-top: 12px;
+}
+.study-message footer small {
+  color: #62747a;
+}
+.study-markdown {
+  line-height: 1.95;
+  font-size: 13px;
+}
+.study-markdown p {
+  margin: 8px 0;
+}
+.study-markdown h1,
+.study-markdown h2,
+.study-markdown h3 {
+  font-size: 16px;
+  margin: 14px 0 8px;
+}
+.study-markdown ul,
+.study-markdown ol {
+  padding-inline-start: 25px;
+  list-style: revert;
+}
+.study-markdown a {
+  color: #12796f;
+  text-decoration: underline;
+}
+.study-markdown pre {
+  background: #142c3a;
+  color: #727576;
+  border-radius: 12px;
+  padding: 16px;
+  overflow: auto;
+  max-width: 100%;
+  font-family: Consolas, monospace;
+  line-height: 1.7;
+  margin: 12px 0;
+}
+.study-markdown code {
+  font-family: Consolas, monospace;
+  font-size: 12px;
+}
+.study-markdown table {
+  display: block;
+  overflow: auto;
+  border-collapse: collapse;
+}
+.study-markdown th,
+.study-markdown td {
+  border: 1px solid #d5e1e5;
+  padding: 8px;
+}
+.study-markdown blockquote {
+  border-inline-start: 3px solid #239b91;
+  padding-inline-start: 12px;
+  color: #56717b;
+}
+.study-prompts {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+.study-prompts button {
+  border: 1px solid #dce9e4;
+  background: #f3f8f5;
+  color: #2a665e;
+  border-radius: 20px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.chat-composer {
+  border-top: 1px solid #e2e9e9;
+  padding-top: 18px;
+}
+.chat-composer textarea {
+  width: 100%;
+  border: 1px solid #dfe6eb;
+  border-radius: 12px;
+  padding: 12px;
+  resize: vertical;
+  min-height: 100px;
+  color: #173d4d;
+  background: #fff;
+}
+.chat-empty {
+  padding: 35px;
+  text-align: center;
+  color: #647781;
+}
+.chat-thinking {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: #167c71;
+  font-size: 12px;
+}
+.context-options {
+  padding: 10px 0;
+  font-size: 12px;
+}
+.context-options summary {
+  cursor: pointer;
+  color: #247065;
+  margin-bottom: 12px;
+}
+.integration-modal {
+  margin: auto;
+  inset: 0;
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+}
+.moodle-status p {
+  margin: 10px 0;
+  font-size: 13px;
+}
+.moodle-course-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.moodle-course {
+  padding: 18px;
+  border: 1px solid #deebe8;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.moodle-course a,
+.moodle-item a {
+  font-size: 12px;
+  color: #12796f;
+  margin-top: 10px;
+  display: inline-block;
+}
+.moodle-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 22px 0;
+  border-bottom: 1px solid #e5ebed;
+}
+.moodle-item > span {
+  background: #eef3fb;
+  color: #426788;
+  padding: 10px;
+  border-radius: 12px;
+}
+.moodle-item > div {
+  min-width: 0;
+}
+.moodle-item h3 {
+  margin: 10px 0 5px;
+}
+.moodle-item p {
+  margin-top: 10px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.moodle-tabs {
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.sync-history {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 13px 0;
+  border-bottom: 1px solid #e8eef0;
+  font-size: 12px;
+}
+.calendar-chip.moodle {
+  background: #efeafa;
+  color: #765091;
+}
+.agenda-item.moodle {
+  border-inline-start: 3px solid #9572b8;
+}
+.moodle-dot {
+  background: #9572b8 !important;
+}
+.calendar-legend .moodle-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+@media (max-width: 1000px) {
+  .study-layout {
+    grid-template-columns: 200px minmax(0, 1fr);
+  }
+  .moodle-course-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .study-layout {
+    grid-template-columns: 1fr;
+  }
+  .conversation-list {
+    max-height: 200px;
+  }
+  .chat-messages {
+    height: 380px;
+  }
+  .moodle-course-grid {
+    grid-template-columns: 1fr;
+  }
+  .study-chat .section-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .study-message {
+    max-width: 100%;
+  }
+  .chat-composer .form-two {
+    grid-template-columns: 1fr;
+  }
+  .study-prompts button {
+    font-size: 12px;
+  }
+}
+
+/* Imported original project theme and dashboard styling */
+.study-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 20px;
+}
+.conversation-list {
+  padding: 18px;
+  align-self: start;
+  max-height: 650px;
+  overflow: auto;
+}
+.conversation-list h2 {
+  margin-bottom: 18px;
+}
+.conversation-item {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: 12px;
+  padding: 5px;
+  margin-bottom: 8px;
+}
+.conversation-item.active {
+  background: #e5f4ef;
+}
+.conversation-item > button:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  text-align: start;
+  border: 0;
+  background: none;
+  padding: 10px 4px;
+  color: #173d4d;
+}
+.conversation-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.study-chat {
+  min-width: 0;
+}
+.chat-messages {
+  height: 430px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 3px 16px;
+  scrollbar-gutter: stable;
+}
+.study-message {
+  border-radius: 15px;
+  padding: 16px;
+  max-width: 95%;
+  overflow-wrap: anywhere;
+}
+.student-message {
+  background: var(--theme-accent-soft);
+  align-self: flex-start;
+  white-space: pre-wrap;
+}
+.assistant-message {
+  background: #f6f8fa;
+  border: 1px solid #dfe8eb;
+  align-self: stretch;
+}
+.study-message header,
+.study-message footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.study-message header {
+  margin-bottom: 12px;
+}
+.study-message footer {
+  margin-top: 12px;
+}
+.study-message footer small {
+  color: #62747a;
+}
+.study-markdown {
+  line-height: 1.95;
+  font-size: 13px;
+}
+.study-markdown p {
+  margin: 8px 0;
+}
+.study-markdown h1,
+.study-markdown h2,
+.study-markdown h3 {
+  font-size: 16px;
+  margin: 14px 0 8px;
+}
+.study-markdown ul,
+.study-markdown ol {
+  padding-inline-start: 25px;
+  list-style: revert;
+}
+.study-markdown a {
+  color: var(--teal);
+  text-decoration: underline;
+}
+.study-markdown pre {
+  background: #142c3a;
+  color: #727576;
+  border-radius: 12px;
+  padding: 16px;
+  overflow: auto;
+  max-width: 100%;
+  font-family: Consolas, monospace;
+  line-height: 1.7;
+  margin: 12px 0;
+}
+.study-markdown code {
+  font-family: Consolas, monospace;
+  font-size: 12px;
+}
+.study-markdown table {
+  display: block;
+  overflow: auto;
+  border-collapse: collapse;
+}
+.study-markdown th,
+.study-markdown td {
+  border: 1px solid #d5e1e5;
+  padding: 8px;
+}
+.study-markdown blockquote {
+  border-inline-start: 3px solid var(--teal);
+  padding-inline-start: 12px;
+  color: #56717b;
+}
+.study-prompts {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+.study-prompts button {
+  border: 1px solid #dce9e4;
+  background: var(--theme-accent-soft);
+  color: var(--teal);
+  border-radius: 20px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.chat-composer {
+  border-top: 1px solid #e2e9e9;
+  padding-top: 18px;
+}
+.chat-composer textarea {
+  width: 100%;
+  border: 1px solid #dfe6eb;
+  border-radius: 12px;
+  padding: 12px;
+  resize: vertical;
+  min-height: 100px;
+  color: #173d4d;
+  background: #fff;
+}
+.chat-empty {
+  padding: 35px;
+  text-align: center;
+  color: #647781;
+}
+.chat-thinking {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--teal);
+  font-size: 12px;
+}
+.context-options {
+  padding: 10px 0;
+  font-size: 12px;
+}
+.context-options summary {
+  cursor: pointer;
+  color: var(--teal);
+  margin-bottom: 12px;
+}
+.integration-modal {
+  margin: auto;
+  inset: 0;
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+}
+.moodle-status p {
+  margin: 10px 0;
+  font-size: 13px;
+}
+.moodle-course-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.moodle-course {
+  padding: 18px;
+  border: 1px solid #deebe8;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.moodle-course a,
+.moodle-item a {
+  font-size: 12px;
+  color: var(--teal);
+  margin-top: 10px;
+  display: inline-block;
+}
+.moodle-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 22px 0;
+  border-bottom: 1px solid #e5ebed;
+}
+.moodle-item > span {
+  background: #eef3fb;
+  color: #426788;
+  padding: 10px;
+  border-radius: 12px;
+}
+.moodle-item > div {
+  min-width: 0;
+}
+.moodle-item h3 {
+  margin: 10px 0 5px;
+}
+.moodle-item p {
+  margin-top: 10px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.moodle-tabs {
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.sync-history {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 13px 0;
+  border-bottom: 1px solid #e8eef0;
+  font-size: 12px;
+}
+.calendar-chip.moodle {
+  background: #efeafa;
+  color: #765091;
+}
+.agenda-item.moodle {
+  border-inline-start: 3px solid #9572b8;
+}
+.moodle-dot {
+  background: #9572b8 !important;
+}
+.calendar-legend .moodle-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+@media (max-width: 1000px) {
+  .study-layout {
+    grid-template-columns: 200px minmax(0, 1fr);
+  }
+  .moodle-course-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .study-layout {
+    grid-template-columns: 1fr;
+  }
+  .conversation-list {
+    max-height: 200px;
+  }
+  .chat-messages {
+    height: 380px;
+  }
+  .moodle-course-grid {
+    grid-template-columns: 1fr;
+  }
+  .study-chat .section-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .study-message {
+    max-width: 100%;
+  }
+  .chat-composer .form-two {
+    grid-template-columns: 1fr;
+  }
+  .study-prompts button {
+    font-size: 12px;
+  }
+}
