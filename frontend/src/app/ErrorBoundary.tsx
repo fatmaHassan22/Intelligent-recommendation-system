@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from "react";
+import { buttonClass } from "../shared/ui";
 
 interface State {
   failed: boolean;
@@ -18,7 +19,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
       <div className="full-state" role="alert">
         <h1>تعذر عرض الصفحة</h1>
         <p>أعد تحميل التطبيق. بياناتك محفوظة في الخادم.</p>
-        <button className="btn btn-primary" onClick={() => location.reload()}>
+        <button className={buttonClass("primary")} onClick={() => location.reload()}>
           إعادة التحميل
         </button>
       </div>

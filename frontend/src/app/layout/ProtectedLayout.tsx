@@ -33,14 +33,17 @@ function AppShell({ userName }: { userName: string }) {
   }, [pathname, closeDrawer]);
 
   return (
-    <div className={`app-shell ${compact ? "compact" : ""}`}>
-      <a href="#main-content" className="skip-link">
+    <div data-compact={compact} className="group/shell min-h-screen">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-3 focus:z-[70] focus:rounded-lg focus:bg-panel focus:px-5 focus:py-2.5 focus:text-fg focus:shadow-pop"
+      >
         {layoutText.skipToContent}
       </a>
 
       {drawer.isOpen && (
         <button
-          className="nav-overlay"
+          className="fixed inset-0 z-[29] border-0 bg-overlay backdrop-blur-[2px] min-[801px]:hidden"
           aria-label={layoutText.closeMenu}
           onClick={drawer.close}
         />
@@ -56,7 +59,10 @@ function AppShell({ userName }: { userName: string }) {
       />
 
       {/* inert: يمنع التركيز والنقر على المحتوى خلف القائمة المفتوحة */}
-      <div className="app-body" inert={drawer.isOpen}>
+      <div
+        className="transition-[margin] duration-200 min-[801px]:ms-[220px] min-[1101px]:ms-[246px] min-[801px]:group-data-[compact=true]/shell:ms-[83px]"
+        inert={drawer.isOpen}
+      >
         <Topbar
           title={getBreadcrumbTitle(pathname)}
           userName={userName}
@@ -67,7 +73,12 @@ function AppShell({ userName }: { userName: string }) {
           onToggleCompact={() => setCompact((value) => !value)}
           onLogout={() => void logout()}
         />
-        <main ref={mainRef} id="main-content" tabIndex={-1} className="main-content">
+        <main
+          ref={mainRef}
+          id="main-content"
+          tabIndex={-1}
+          className="mx-auto min-h-[calc(100vh-130px)] max-w-[1380px] px-[37px] pt-[27px] pb-5 outline-none min-[1600px]:pt-[34px] max-[1100px]:p-[25px] max-[800px]:p-[22px]"
+        >
           <Suspense fallback={<Skeleton />}>
             <Outlet />
           </Suspense>

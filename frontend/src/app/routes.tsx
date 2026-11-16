@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import { Link, Route, Routes } from "react-router-dom";
 import { navigation } from "../config/navigation";
 import { Skeleton } from "../shared/ui";
@@ -90,6 +90,8 @@ const MoodlePage = lazyNamed(
 );
 
 const ThemePage = lazyNamed(() => import("../features/theme/theme"), "ThemePage");
+// معرض المكونات: يُحذف تلقائياً من نسخة الإنتاج (import.meta.env.DEV = false).
+const UiKit = lazy(() => import("../features/dev/UiKit"));
 const FuturePage = lazyNamed(() => import("../features/future/FuturePage"), "FuturePage");
 
 const FullScreenLoader = () => (
@@ -118,6 +120,7 @@ export function AppRoutes() {
         <Route path="/app" element={<ProtectedLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="profile" element={<ProfilePage />} />
+          {import.meta.env.DEV && <Route path="_ui" element={<UiKit />} />}
           <Route path="theme" element={<ThemePage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="curriculum" element={<Curriculum />} />

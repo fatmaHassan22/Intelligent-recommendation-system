@@ -2,6 +2,7 @@
   min-width: 0;
 }
 .dashboard-hero {
+  font-family: "Cairo", sans-serif;
   position: relative;
   overflow: hidden;
   gap: 24px;
@@ -146,4 +147,10 @@
   .dashboard-empty-progress > div {
     min-width: 0;
   }
-}
+} 
+
+/* dashboard.css */
+/* .student-dashboard {
+  font-family: "Cairo", sans-serif;
+  direction: rtl;
+} */

@@ -20,6 +20,7 @@ import {
   number,
   roleLabel,
   useToast,
+  buttonClass,
 } from "../../shared/ui";
 import { prefix, useDrafts, useRefreshPlanning } from "./hooks";
 import { categoryLabels, offeringLabels } from "./labels";
@@ -183,7 +184,7 @@ export function RecommendationsPage() {
         title="توصية المواد"
         description="توصيات حتمية من بيانات خطتك وإنجازك. أهلية المساق الأكاديمية وحالة طرحه تظهران بشكل منفصل."
         action={
-          <Link className="btn btn-secondary" to="/app/planner">
+          <Link className={buttonClass("secondary")} to="/app/planner">
             مسوداتي
             <ArrowLeft size={16} />
           </Link>

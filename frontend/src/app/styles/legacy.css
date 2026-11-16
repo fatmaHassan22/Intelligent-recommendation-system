@@ -1,0 +1,16 @@
+/*
+ * ملفات CSS القديمة (قبل Tailwind) كلها داخل طبقة `legacy`.
+ * ⚠️ ترتيب الاستيراد هنا مهم (القاعدة الأحدث تغلب الأقدم عند تساوي الخصوصية).
+ * عند تحويل مكوّن إلى Tailwind احذف قواعده من هذه الملفات بعد التأكد أنه لم يعد مستخدماً.
+ */
+@import "./base.css" layer(legacy);
+@import "../../features/landing/landing.css" layer(legacy);
+@import "../../features/auth/auth.css" layer(legacy);
+@import "../layout/app-shell.css" layer(legacy);
+@import "../../features/academic/academic.css" layer(legacy);
+@import "./refinements.css" layer(legacy);
+@import "../../features/productivity/styles.css" layer(legacy);
+@import "../../features/engagement/styles.css" layer(legacy);
+@import "../../features/integrations/styles.css" layer(legacy);
+@import "../../features/theme/theme.css" layer(legacy);
+@import "../../features/academic/dashboard.css" layer(legacy);

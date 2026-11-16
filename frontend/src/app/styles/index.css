@@ -1,4 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
 @import "tailwindcss";
+@import "./tokens.css";
 
 @theme {
   --color-ink: #0b1f3a;
@@ -84,6 +86,8 @@
     scroll-behavior: smooth;
   }
   body {
+    font-family:"Cairo", sans-serif;
+  
     @apply bg-surface font-sans text-ink leading-relaxed antialiased;
   }
   :focus-visible {

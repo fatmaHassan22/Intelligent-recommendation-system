@@ -192,9 +192,9 @@ export function PomodoroPage() {
           ) : (
             <>
               <div
-                className="timer-ring"
+                className={`timer-ring${live?.state === "RUNNING" ? " is-running" : live?.state === "PAUSED" ? " is-paused" : ""}`}
                 style={{
-                  background: `conic-gradient(var(--teal) ${progress}%, #e8efef ${progress}%)`,
+                  background: `conic-gradient(var(--teal) ${progress}%, var(--app-panel-2, #e8efef) ${progress}%)`,
                 }}
                 role="progressbar"
                 aria-label="تقدم جلسة بومودورو"

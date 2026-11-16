@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactNode, useId } from "react";
 import { X } from "lucide-react";
-import { Button } from "./Button";
+import { Button, iconButtonClass } from "./Button";
+import { cn } from "../lib/cn";
 
 export function Modal({
   title,
@@ -27,7 +28,10 @@ export function Modal({
   return (
     <dialog
       ref={ref}
-      className={`modal ${className}`}
+      className={cn(
+        "m-auto w-[calc(100%-2rem)] max-w-[510px] rounded-card border border-edge bg-panel p-6 text-fg shadow-pop backdrop:bg-overlay backdrop:backdrop-blur-[3px]",
+        className,
+      )}
       aria-labelledby={id}
       onCancel={(e) => {
         e.preventDefault();
@@ -37,9 +41,11 @@ export function Modal({
         if (e.target === ref.current) onClose();
       }}
     >
-      <header>
-        <h2 id={id}>{title}</h2>
-        <button className="icon-btn" aria-label="إغلاق" onClick={onClose}>
+      <header className="mb-4 flex items-center justify-between gap-3">
+        <h2 id={id} className="text-lg font-bold text-fg">
+          {title}
+        </h2>
+        <button className={iconButtonClass()} aria-label="إغلاق" onClick={onClose}>
           <X size={20} />
         </button>
       </header>
@@ -68,8 +74,8 @@ export function Confirm({
         if (!busy) onClose();
       }}
     >
-      <p className="confirm-copy">{description}</p>
-      <div className="dialog-actions">
+      <p className="text-[13px] leading-relaxed text-fg-muted">{description}</p>
+      <div className="mt-5 flex justify-end gap-2.5">
         <Button variant="secondary" disabled={busy} onClick={onClose} autoFocus>
           إلغاء
         </Button>

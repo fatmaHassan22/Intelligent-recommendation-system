@@ -3,7 +3,15 @@ import { Link } from "react-router-dom";
 import { Plus, CheckCircle2, Clock3, Timer, ArrowLeft } from "lucide-react";
 import type { Result } from "../../shared/api/types";
 import type { ProductivitySummary } from "./api";
-import { Button, Empty, ErrorState, Skeleton, Stat, number } from "../../shared/ui";
+import {
+  Button,
+  Empty,
+  ErrorState,
+  Skeleton,
+  Stat,
+  number,
+  buttonClass,
+} from "../../shared/ui";
 import { useProductivityQuery, useTimezone } from "./hooks";
 import { timestampLabel, dateKey } from "./time";
 import { TaskEditor } from "./TaskEditor";
@@ -28,7 +36,7 @@ export function ProductivityDashboard() {
             <Plus size={16} />
             مهمة جديدة
           </Button>
-          <Link className="btn btn-primary" to="/app/pomodoro">
+          <Link className={buttonClass("primary")} to="/app/pomodoro">
             <Timer size={16} />
             ابدأ التركيز
           </Link>
