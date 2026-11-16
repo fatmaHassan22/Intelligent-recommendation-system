@@ -1,7 +1,7 @@
 import { EngagementSettings } from "../engagement/EngagementSettings";
 import { Link } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
-import { Notice, PageHeader } from "../../shared/ui";
+import { Notice, PageHeader, buttonClass } from "../../shared/ui";
 
 export function SettingsPage() {
   return (
@@ -15,10 +15,10 @@ export function SettingsPage() {
           <ShieldCheck size={35} />
           <h2>حسابك وخصوصيتك</h2>
           <p>تعديل الاسم والتخصص والخطة وتفضيلات الدراسة متاح من ملفك الأكاديمي.</p>
-          <Link className="btn btn-primary" to="/app/profile">
+          <Link className={buttonClass("primary")} to="/app/profile">
             فتح الملف الأكاديمي
           </Link>
-          <Link className="btn btn-secondary" to="/app/notifications">
+          <Link className={buttonClass("secondary")} to="/app/notifications">
             مركز الإشعارات وتفضيلاته
           </Link>
         </div>

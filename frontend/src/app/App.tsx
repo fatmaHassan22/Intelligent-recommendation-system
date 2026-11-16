@@ -1,15 +1,10 @@
-import "@fontsource/cairo/400.css";
-import "@fontsource/cairo/500.css";
-import "@fontsource/cairo/600.css";
-import "@fontsource/cairo/700.css";
-import "@fontsource/cairo/800.css";
-// ترتيب الـ CSS مهم (الأحدث يطغى على الأقدم عند تساوي الخصوصية).
-import "./styles/global.css";
-import "../features/productivity/styles.css";
-import "../features/engagement/styles.css";
-import "../features/integrations/styles.css";
-import "../features/theme/theme.css";
-import "../features/academic/dashboard.css";
+import "@fontsource/cairo/arabic-400.css";
+import "@fontsource/cairo/arabic-500.css";
+import "@fontsource/cairo/arabic-600.css";
+import "@fontsource/cairo/arabic-700.css";
+// layers.css أولاً (يحدد ترتيب الطبقات)، ثم legacy.css (كل الـ CSS القديم داخل طبقة legacy).
+import "./styles/layers.css";
+import "./styles/legacy.css";
 
 import { ErrorBoundary } from "./ErrorBoundary";
 import { Providers } from "./Providers";

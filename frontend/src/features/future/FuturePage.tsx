@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { ArrowRight, Construction, Compass } from "lucide-react";
 import { navigation } from "../../config/navigation";
-import { Badge, PageHeader } from "../../shared/ui";
+import { Badge, PageHeader, buttonClass } from "../../shared/ui";
 const descriptions: Record<string, string> = {
   recommendations:
     "توصيات المساقات تحتاج محركًا يعتمد على بيانات أكاديمية مكتملة. هذه المرحلة تعرض خطتك وإنجازك فقط.",
@@ -32,7 +32,7 @@ export function FuturePage() {
         <p>
           {descriptions[slug] ?? "هذه الصفحة غير متاحة. يمكنك العودة لمساحتك الأكاديمية."}
         </p>
-        <Link className="btn btn-secondary" to="/app">
+        <Link className={buttonClass("secondary")} to="/app">
           <ArrowRight size={17} />
           العودة للرئيسية
         </Link>

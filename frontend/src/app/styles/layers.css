@@ -1,0 +1,7 @@
+/*
+ * ترتيب طبقات الـ CSS (الأخير يغلب الأول بغض النظر عن الخصوصية):
+ *   theme < base (Tailwind preflight) < legacy (ملفات CSS القديمة) < components < utilities
+ * لذلك أي utility من Tailwind على عنصر يغلب القواعد القديمة، ما يسمح بالتحويل التدريجي.
+ * يجب أن يكون هذا الملف أول ملف CSS يُستورد.
+ */
+@layer theme, base, legacy, components, utilities;

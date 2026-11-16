@@ -1,0 +1,110 @@
+/*
+ * Design tokens للتطبيق (مساحة الطالب).
+ *
+ * طبقتان:
+ *  1) متغيرات CSS دلالية (--app-*) تنقلب تلقائياً في الوضع الداكن، فلا حاجة لـ dark: في المكونات.
+ *  2) أسماء Tailwind (bg-panel, text-fg, border-edge, bg-brand...) تقرأ من تلك المتغيرات.
+ *
+ * لون العلامة (brand) يتبع الـ palette الذي يختاره المستخدم من صفحة المظهر:
+ * ThemeProvider يضبط --teal و --theme-accent-soft و --theme-brand-deep وقت التشغيل.
+ */
+
+/* الوضع الداكن يُفعَّل من ThemeProvider عبر data-theme-mode على <html> (وليس class). */
+@custom-variant dark (&:where([data-theme-mode="dark"], [data-theme-mode="dark"] *));
+
+@layer base {
+  :root {
+    --app-fg: #193247;
+    --app-muted: #5b6f80;
+    --app-panel: #ffffff;
+    --app-panel-2: #f3f7f8;
+    --app-edge: #dde5ea;
+    --app-input: #ffffff;
+    --app-input-edge: #cdd9df;
+    --app-danger: #b42318;
+    --app-danger-soft: #fef3f2;
+    --app-danger-edge: #fecdca;
+    --app-warn: #8a5300;
+    --app-warn-soft: #fff6df;
+    --app-info: #175cd3;
+    --app-info-soft: #eaf2ff;
+    --app-overlay: rgb(16 38 56 / 0.5);
+    /* لون العلامة الفاتح/العميق يتبع الـ palette، وينقلب في الداكن إلى درجات مناسبة للخلفية الداكنة */
+    --app-brand-soft: var(--theme-accent-soft, #e3f4f1);
+    --app-brand-deep: var(--theme-brand-deep, #11776e);
+    --app-brand-text: var(--teal, #168e83);
+    --app-topbar: color-mix(in srgb, var(--theme-accent-soft, #e3f4f1) 42%, white);
+    --app-topbar-edge: color-mix(in srgb, var(--teal, #168e83) 18%, #e5ebef);
+  }
+  html[data-theme-mode="dark"] {
+    --app-fg: #e6edf3;
+    --app-muted: #a4b1be;
+    --app-panel: #1b2630;
+    --app-panel-2: #15212b;
+    --app-edge: #2d3a45;
+    --app-input: #15212b;
+    --app-input-edge: #35434f;
+    --app-danger: #fda29b;
+    --app-danger-soft: #2c1a1a;
+    --app-danger-edge: #5c2b2b;
+    --app-warn: #fdd68a;
+    --app-warn-soft: #2e2615;
+    --app-info: #9ec5fe;
+    --app-info-soft: #16253a;
+    --app-overlay: rgb(5 10 15 / 0.65);
+    --app-brand-soft: color-mix(in srgb, var(--teal, #168e83) 22%, #15212b);
+    --app-brand-deep: color-mix(in srgb, var(--teal, #168e83) 62%, white);
+    --app-brand-text: color-mix(in srgb, var(--teal, #168e83) 66%, white);
+    --app-topbar: color-mix(in srgb, var(--theme-brand-deep, #11776e) 68%, #111820);
+    --app-topbar-edge: color-mix(in srgb, var(--teal, #168e83) 25%, #34414b);
+  }
+}
+
+@theme inline {
+  /* العلامة: تتبع الـ palette المختار */
+  --color-brand: var(--teal);
+  --color-brand-soft: var(--app-brand-soft);
+  --color-brand-deep: var(--app-brand-deep);
+  --color-brand-text: var(--app-brand-text);
+  --color-topbar: var(--app-topbar);
+  --color-topbar-edge: var(--app-topbar-edge);
+
+  /* الشريط الجانبي: يتبع الـ palette في الوضعين */
+  --color-rail: color-mix(in srgb, var(--theme-brand-deep, #12293b) 91%, #111820);
+  --color-rail-active: color-mix(
+    in srgb,
+    var(--teal, #168e83) 36%,
+    var(--theme-brand-deep, #11776e)
+  );
+  --color-rail-accent: color-mix(in srgb, var(--teal, #168e83) 65%, white);
+  --color-rail-fg: #dbe5ea;
+  --color-rail-muted: #b8c7d0;
+
+  /* دلالية: تنقلب مع الوضع الداكن */
+  --color-fg: var(--app-fg);
+  --color-fg-muted: var(--app-muted);
+  --color-panel: var(--app-panel);
+  --color-panel-2: var(--app-panel-2);
+  --color-edge: var(--app-edge);
+  --color-input: var(--app-input);
+  --color-input-edge: var(--app-input-edge);
+  --color-danger: var(--app-danger);
+  --color-danger-soft: var(--app-danger-soft);
+  --color-danger-edge: var(--app-danger-edge);
+  --color-warn: var(--app-warn);
+  --color-warn-soft: var(--app-warn-soft);
+  --color-info: var(--app-info);
+  --color-info-soft: var(--app-info-soft);
+  --color-overlay: var(--app-overlay);
+}
+
+@theme {
+  /* نصف الأقطار */
+  --radius-control: 0.75rem;
+  --radius-card: 1rem;
+
+  /* الظلال */
+  --shadow-card: 0 1px 2px rgb(18 50 75 / 0.04), 0 6px 22px rgb(18 50 75 / 0.05);
+  --shadow-pop: 0 24px 64px rgb(0 19 37 / 0.28);
+  --shadow-brand: 0 6px 16px color-mix(in srgb, var(--teal, #168e83) 28%, transparent);
+}

@@ -17,6 +17,7 @@ import {
   Skeleton,
   number,
   useToast,
+  iconButtonClass,
 } from "../../shared/ui";
 import {
   prefix,
@@ -273,7 +274,7 @@ export function NotificationsPage() {
               </div>
               <div className="notification-actions">
                 <button
-                  className="icon-btn"
+                  className={iconButtonClass()}
                   aria-label={n.read_at ? "وضع الإشعار كغير مقروء" : "قراءة الإشعار"}
                   disabled={change.isPending}
                   onClick={() => change.mutate({ id: n.id, read: !n.read_at })}
@@ -281,7 +282,7 @@ export function NotificationsPage() {
                   <Check size={18} />
                 </button>
                 <button
-                  className="icon-btn"
+                  className={iconButtonClass()}
                   aria-label="إخفاء الإشعار"
                   disabled={change.isPending}
                   onClick={() => change.mutate({ id: n.id, dismiss: true })}

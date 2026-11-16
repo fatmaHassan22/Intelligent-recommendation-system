@@ -18,6 +18,7 @@ import {
   Skeleton,
   number,
   useToast,
+  buttonClass,
 } from "../../shared/ui";
 import {
   prefix,
@@ -232,7 +233,10 @@ export function TasksPage() {
               </p>
               <p className="muted">{detail.data.data.course_name}</p>
               <div className="dialog-actions">
-                <Link className="btn btn-secondary" to={`/app/pomodoro?task=${taskId}`}>
+                <Link
+                  className={buttonClass("secondary")}
+                  to={`/app/pomodoro?task=${taskId}`}
+                >
                   <Timer size={17} />
                   تركيز على المهمة
                 </Link>

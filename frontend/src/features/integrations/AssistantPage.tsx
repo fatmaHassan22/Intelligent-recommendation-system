@@ -16,6 +16,7 @@ import {
   Select,
   Skeleton,
   useToast,
+  iconButtonClass,
 } from "../../shared/ui";
 import type { AiConversation, AiDetail, AiUsage, ChatInput, MoodleStatus } from "./types";
 import { integrationPrefix, useIntegration, useIntegrationRefresh } from "./hooks";
@@ -213,14 +214,14 @@ export function AssistantPage() {
                   <span>{c.title}</span>
                 </button>
                 <button
-                  className="icon-btn"
+                  className={iconButtonClass()}
                   aria-label={`تسمية ${c.title}`}
                   onClick={() => setRenaming(c)}
                 >
                   <Pencil size={14} />
                 </button>
                 <button
-                  className="icon-btn"
+                  className={iconButtonClass()}
                   aria-label={`حذف ${c.title}`}
                   onClick={() => setDeleting(c)}
                 >

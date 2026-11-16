@@ -1,4 +1,4 @@
-export { Button } from "./Button";
+export { Button, buttonClass, iconButtonClass, type ButtonVariant } from "./Button";
 export { Input, Select } from "./Form";
 export { Badge } from "./Badge";
 export { Skeleton, Empty, ErrorState, Notice } from "./Feedback";

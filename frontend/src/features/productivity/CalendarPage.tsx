@@ -26,6 +26,7 @@ import {
   PageHeader,
   Skeleton,
   useToast,
+  iconButtonClass,
 } from "../../shared/ui";
 import {
   prefix,
@@ -216,7 +217,7 @@ export function CalendarPage() {
       <div className="calendar-toolbar">
         <div className="inline-actions">
           <button
-            className="icon-btn"
+            className={iconButtonClass()}
             aria-label="الفترة السابقة"
             onClick={() => move(-1)}
           >
@@ -230,7 +231,7 @@ export function CalendarPage() {
                 : dayLabel(day, { weekday: "long", day: "numeric", month: "long" })}
           </h2>
           <button
-            className="icon-btn"
+            className={iconButtonClass()}
             aria-label="الفترة التالية"
             onClick={() => move(1)}
           >

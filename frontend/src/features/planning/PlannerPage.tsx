@@ -20,6 +20,7 @@ import {
   modeLabel,
   number,
   useToast,
+  buttonClass,
 } from "../../shared/ui";
 import { prefix, useDrafts, useTerms, useRefreshPlanning } from "./hooks";
 import { StudyOptions, TermOptions } from "./components";
@@ -112,7 +113,7 @@ export function PlannerPage() {
                 </span>
               </div>
               <footer>
-                <Link className="btn btn-secondary" to={`/app/planner/${p.id}`}>
+                <Link className={buttonClass("secondary")} to={`/app/planner/${p.id}`}>
                   فتح وتعديل
                   <ArrowLeft size={16} />
                 </Link>

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Trash2, Pencil, CheckCircle2, Clock3, BookOpen } from "lucide-react";
 import type { Task, TaskStatus } from "./api";
-import { Badge } from "../../shared/ui";
+import { Badge, iconButtonClass } from "../../shared/ui";
 import { dayLabel } from "./time";
 import { priorityLabel, statusLabel } from "./labels";
 
@@ -23,7 +23,9 @@ export function TaskRow({
       <button
         className={`task-check ${task.status === "COMPLETED" ? "checked" : ""}`}
         aria-label={`${task.status === "COMPLETED" ? "إعادة فتح" : "إكمال"} المهمة ${task.title}`}
-        onClick={() => onStatus?.(task.status === "COMPLETED" ? "TODO" : "COMPLETED")}
+        onClick={() =>
+          onStatus?.(task.status === "COMPLETED" ? "TODO" : "COMPLETED")
+        }
         disabled={!onStatus}
       >
         <CheckCircle2 size={30} />
@@ -65,7 +67,7 @@ export function TaskRow({
       <div className="task-actions">
         {onEdit && (
           <button
-            className="icon-btn"
+            className={iconButtonClass()}
             aria-label={`تعديل المهمة ${task.title}`}
             onClick={onEdit}
           >
